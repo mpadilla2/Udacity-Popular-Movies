@@ -3,6 +3,7 @@ package com.udacity.movietip.network;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.udacity.movietip.BuildConfig;
 import com.udacity.movietip.models.MoviesModel;
 
 import java.text.DateFormat;
@@ -35,7 +36,7 @@ public class TMDBApiControllerNetwork {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/";
 
-    private static final String API_KEY = "";
+    private static final String TMDB_API_KEY = BuildConfig.TMDB_API_KEY;
 
     private static Retrofit retrofit = null;
 
