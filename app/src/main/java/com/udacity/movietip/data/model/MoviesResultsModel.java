@@ -1,4 +1,4 @@
-package com.udacity.movietip.models;
+package com.udacity.movietip.data.model;
 
 import java.util.ArrayList;
 import java.util.List;

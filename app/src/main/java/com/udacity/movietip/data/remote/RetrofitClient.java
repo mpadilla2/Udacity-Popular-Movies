@@ -1,22 +1,20 @@
-package com.udacity.movietip.network;
+package com.udacity.movietip.data.remote;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.udacity.movietip.BuildConfig;
-import com.udacity.movietip.models.MoviesModel;
 
 import java.text.DateFormat;
+
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class TMDBApiControllerNetwork {
-
        /*
-    TMDBApiControllerNetwork
+    RetrofitClient
        ** Network calls with Retrofit
           Reference: http://square.github.io/retrofit/
+          Reference: https://code.tutsplus.com/tutorials/getting-started-with-retrofit-2--cms-27792
 
        ** Image Loading with Glide
           Reference: https://bumptech.github.io/glide/
@@ -25,22 +23,15 @@ public class TMDBApiControllerNetwork {
           /movies/popular list updates daily. make a check for this before grabbing the popular list.
           /movies/top_rated
 
-       http://www.vogella.com/tutorials/Retrofit/article.html
-
        Similar to Controller class in this tutorial
     */
 
-    /*
-    In here I should create the Retrofit client, call the TMBD API and handle the result
-     */
 
-    private static final String BASE_URL = "http://api.themoviedb.org/3/";
-
-    private static final String TMDB_API_KEY = BuildConfig.TMDB_API_KEY;
+public class RetrofitClient {
 
     private static Retrofit retrofit = null;
 
-    public static Retrofit getRetrofitClient(){
+    public static Retrofit getRetrofitClient(String baseUrl){
 
         Gson gson = new GsonBuilder()
                 .serializeNulls()
@@ -49,13 +40,13 @@ public class TMDBApiControllerNetwork {
                 .create();
 
         if (retrofit == null){
-            retrofit = new Retrofit
-                    .Builder()
-                    .baseUrl(BASE_URL)
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(baseUrl)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
 
         return retrofit;
     }
+
 }
