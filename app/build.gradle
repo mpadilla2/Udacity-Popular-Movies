@@ -10,7 +10,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // I've hidden my tmdb api key. Please ensure you enter a valid tmdb api key to use this app.
-        buildConfigField("String", "TMDB_API_KEY", TMDB_API_KEY)
+        buildConfigField("String", "API_KEY", API_KEY)
     }
     buildTypes {
         release {
@@ -26,9 +26,15 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:recyclerview-v7:26.1.0'
 
-    implementation 'com.google.code.gson:gson:2.8.4'
+    // http calls
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+
+    // json parsing and conversion to object
+    implementation 'com.google.code.gson:gson:2.8.4'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    // interceptor to inject api key to all api calls
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

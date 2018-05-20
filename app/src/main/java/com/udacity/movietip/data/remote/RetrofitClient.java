@@ -1,16 +1,25 @@
 package com.udacity.movietip.data.remote;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.udacity.movietip.BuildConfig;
 
+import java.io.IOException;
 import java.text.DateFormat;
 
 
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-       /*
+    /*
     RetrofitClient
        ** Network calls with Retrofit
           Reference: http://square.github.io/retrofit/
@@ -23,7 +32,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
           /movies/popular list updates daily. make a check for this before grabbing the popular list.
           /movies/top_rated
 
-       Similar to Controller class in this tutorial
+       ** Interceptor to add API Key
+          http://square.github.io/okhttp/
+          Reference: https://github.com/square/okhttp/wiki/Interceptors
+          Reference: https://mobikul.com/use-interceptor-add-headers-body-retrofit-2-0/
     */
 
 
@@ -39,9 +51,14 @@ public class RetrofitClient {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
 
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor())
+                .build();
+
         if (retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
+                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
         }
@@ -49,4 +66,23 @@ public class RetrofitClient {
         return retrofit;
     }
 
+    private static class AuthInterceptor implements Interceptor {
+
+        private AuthInterceptor(){
+        }
+
+        @Override
+        public Response intercept(@NonNull Chain chain) throws IOException {
+
+            HttpUrl url = chain.request().url().newBuilder()
+                    .addQueryParameter("api_key", BuildConfig.API_KEY)
+                    .build();
+
+            Request request = chain.request().newBuilder()
+                    .url(url)
+                    .build();
+
+            return chain.proceed(request);
+        }
+    }
 }
