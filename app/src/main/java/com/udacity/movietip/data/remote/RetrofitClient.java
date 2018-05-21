@@ -58,8 +58,8 @@ public class RetrofitClient {
         if (retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
-                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create(gson))
+                    .client(client)
                     .build();
         }
 

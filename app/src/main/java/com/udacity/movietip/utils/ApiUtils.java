@@ -9,9 +9,7 @@ import com.udacity.movietip.data.remote.RetrofitClient;
 
 public class ApiUtils {
 
-    /* create the implementation of the ApiService
-       Pass in the movie object type desired; check which type and make appropriate interface call
-     */
+    /* create the implementation of the ApiService */
 
     public static ApiService getApiService(Context context) {
 
