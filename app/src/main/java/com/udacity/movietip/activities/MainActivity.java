@@ -20,8 +20,9 @@ public class MainActivity extends AppCompatActivity {
 
     /*
     DONE Generify the Interface methods. Test for OK response.
+    todo bottom navigation in main
+    todo fragments for bottom navigation
     TODO Add a recycler view. Test for Ok response.
-    TODO Refactor to fragments. Test for ok response in each fragment.
     TODO Display data in recyclerview gridview.
     TODO Respond to click with toast message.
     TODO Design details fragment.
