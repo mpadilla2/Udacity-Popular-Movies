@@ -1,9 +1,12 @@
 package com.udacity.movietip.activities;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.udacity.movietip.R;
@@ -19,8 +22,10 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     /*
+    https://materialdoc.com/components/bottom-navigation/
     DONE Generify the Interface methods. Test for OK response.
-    todo bottom navigation in main
+    DONE bottom navigation in main
+    DONE listen for clicks and set navigation view accordingly
     todo fragments for bottom navigation
     TODO Add a recycler view. Test for Ok response.
     TODO Display data in recyclerview gridview.
@@ -58,15 +63,43 @@ main activity layout has to have a container for the fragment
     private ApiService mService;
     private TextView mTextView;
 
+    private TextView mTextMessage;
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_home:
+                    mTextMessage.setText(R.string.title_home);
+                    return true;
+                case R.id.navigation_dashboard:
+                    mTextMessage.setText(R.string.title_dashboard);
+                    return true;
+                case R.id.navigation_notifications:
+                    mTextMessage.setText(R.string.title_notifications);
+                    return true;
+                case R.id.navigation_favorites:
+                    mTextMessage.setText(R.string.title_favorites);
+            }
+            return false;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextView = (TextView) findViewById(R.id.test_json_return);
+        //mTextView = (TextView) findViewById(R.id.test_json_return);
         mService = ApiUtils.getApiService(this);
 
-        loadMoviesData();
+        //loadMoviesData();
+
+        mTextMessage = (TextView) findViewById(R.id.message);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     public void loadMoviesData(){

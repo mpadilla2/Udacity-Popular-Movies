@@ -1,7 +1,16 @@
 <resources>
     <string name="app_name">MovieTip</string>
+
+    <!-- API usage -->
     <string name="base_url">http://api.themoviedb.org/3/</string>
     <string name="movies_popular_path">"popular"</string>
     <string name="movies_top_rated_path">"top_rated"</string>
     <string name="movies_now_playing_path">"now_playing"</string>
+
+    <!-- Bottom navigation view -->
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_favorites">Favorites</string>
+
 </resources>
