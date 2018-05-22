@@ -2,22 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_popular"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_popular" />
+        android:title="@string/title_popular"
+        android:icon="@drawable/ic_thumb_up_black_24dp" />
 
     <item
         android:id="@+id/navigation_top_rated"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_top_rated" />
+        android:title="@string/title_top_rated"
+        android:icon="@drawable/ic_star_black_24dp" />
 
     <item
         android:id="@+id/navigation_now_playing"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_now_playing"/>
+        android:title="@string/title_now_playing"
+        android:icon="@drawable/ic_movie_filter_black_24dp" />
 
     <item
         android:id="@+id/navigation_favorites"
-        android:icon="@drawable/ic_favorite_black_24dp"
-        android:title="@string/title_favorites" />
-
+        android:title="@string/title_favorites"
+        android:icon="@drawable/ic_favorite_black_24dp"/>
 </menu>

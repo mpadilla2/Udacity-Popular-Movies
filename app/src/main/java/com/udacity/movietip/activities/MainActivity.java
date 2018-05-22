@@ -61,9 +61,8 @@ main activity layout has to have a container for the fragment
      */
 
     private ApiService mService;
-    private TextView mTextView;
-
     private TextView mTextMessage;
+    private Response<MoviesModel> moviesResponse;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -72,16 +71,16 @@ main activity layout has to have a container for the fragment
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_popular:
-                    mTextMessage.setText(R.string.title_popular);
+                    mTextMessage.setText(moviesResponse.body().getTotalResults().toString());
                     return true;
                 case R.id.navigation_top_rated:
-                    mTextMessage.setText(R.string.title_top_rated);
+                    mTextMessage.setText(moviesResponse.body().getPage().toString());
                     return true;
                 case R.id.navigation_now_playing:
-                    mTextMessage.setText(R.string.title_now_playing);
+                    mTextMessage.setText(moviesResponse.body().getResults().toString());
                     return true;
                 case R.id.navigation_favorites:
-                    mTextMessage.setText(R.string.title_favorites);
+                    mTextMessage.setText(moviesResponse.body().getTotalPages().toString());
                     return true;
             }
             return false;
@@ -93,10 +92,9 @@ main activity layout has to have a container for the fragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //mTextView = (TextView) findViewById(R.id.test_json_return);
         mService = ApiUtils.getApiService(this);
 
-        //loadMoviesData();
+        loadMoviesData();
 
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -111,7 +109,7 @@ main activity layout has to have a container for the fragment
                 @Override
             public void onResponse(Call<MoviesModel> call, Response<MoviesModel> response) {
                 if (response.body() != null) {
-                    mTextView.setText(response.body().getTotalResults().toString());
+                    moviesResponse = response;
                     Log.d("MainActivity", "data loaded from API");
                 }else{
                     Log.d("MainActivity", "null returned from API");
