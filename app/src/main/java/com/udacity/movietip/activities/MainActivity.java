@@ -34,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
     TODO On click display details activity.
 
     Inside the fragment layout, fragment_movie_grid, I will define the recycler view.
-Inside the MovieGridFragment, I will
-	inflate the fragment_movie_grid
+    Inside the MovieGridFragment, I will inflate the fragment_movie_grid
 	get a reference to the recycler view inside the fragment layout
 	add a click listener to handle clicks on the individual posters
 	use parcelable to create a parcel to use in saving state
@@ -56,7 +55,7 @@ Lesson 7 and 12 Background Tasks talks about loaders rewatch these and implement
 1. Create a layout that defines the appearance of the fragment
 2. Create a new fragment class that inflates a layout
 main activity layout has to have a container for the fragment
-3. Create a new fragment instance in a host activity
+3. Create a new fragment instance in a host activity (MainActivity)
 4. Add the fragment to it's host activity using the FragmentManager and a fragment transaction
      */
 
