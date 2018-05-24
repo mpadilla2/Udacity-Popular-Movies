@@ -1,4 +1,4 @@
-package com.udacity.movietip.fragments;
+package com.udacity.movietip.ui.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -7,18 +7,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.udacity.movietip.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link MovieGrid.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link MovieGrid#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MovieGrid extends Fragment {
+public class MovieGridFragment extends Fragment {
 
     // Tag for logging
     private static final String TAG = "MovieGridFragment";
@@ -34,7 +27,7 @@ public class MovieGrid extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public MovieGrid() {
+    public MovieGridFragment() {
         // Required empty public constructor
     }
 
@@ -44,11 +37,11 @@ public class MovieGrid extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MovieGrid.
+     * @return A new instance of fragment MovieGridFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MovieGrid newInstance(String param1, String param2) {
-        MovieGrid fragment = new MovieGrid();
+    public static MovieGridFragment newInstance(String param1, String param2) {
+        MovieGridFragment fragment = new MovieGridFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -69,7 +62,9 @@ public class MovieGrid extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        TextView textView = (TextView) rootView.findViewById(R.id.movie_grid_message);
+        return  rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -110,4 +105,16 @@ public class MovieGrid extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+
 }

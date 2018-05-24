@@ -1,4 +1,4 @@
-package com.udacity.movietip.utils;
+package com.udacity.movietip.data.utils;
 
 import android.content.Context;
 import android.content.res.Resources;

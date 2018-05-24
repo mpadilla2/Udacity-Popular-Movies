@@ -1,27 +1,33 @@
-package com.udacity.movietip.activities;
+package com.udacity.movietip.ui.activities;
 
-import android.content.Context;
+import android.app.FragmentManager;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.MoviesModel;
 import com.udacity.movietip.data.remote.ApiService;
-import com.udacity.movietip.utils.ApiUtils;
+import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.ui.fragments.MovieGridFragment;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnFragmentInteractionListener{
 
     /*
+    https://www.simplifiedcoding.net/bottom-navigation-android-example
     https://materialdoc.com/components/bottom-navigation/
     DONE Generify the Interface methods. Test for OK response.
     DONE bottom navigation in main
@@ -70,16 +76,12 @@ main activity layout has to have a container for the fragment
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_popular:
-                    mTextMessage.setText(moviesResponse.body().getTotalResults().toString());
                     return true;
                 case R.id.navigation_top_rated:
-                    mTextMessage.setText(moviesResponse.body().getPage().toString());
                     return true;
                 case R.id.navigation_now_playing:
-                    mTextMessage.setText(moviesResponse.body().getResults().toString());
                     return true;
                 case R.id.navigation_favorites:
-                    mTextMessage.setText(moviesResponse.body().getTotalPages().toString());
                     return true;
             }
             return false;
@@ -91,13 +93,40 @@ main activity layout has to have a container for the fragment
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+
+        final Fragment popularFragment = new MovieGridFragment();
+        final Fragment topRatedFragment = new MovieGridFragment();
+        final Fragment nowPlayingFragment = new MovieGridFragment();
+
         mService = ApiUtils.getApiService(this);
 
         loadMoviesData();
 
-        mTextMessage = (TextView) findViewById(R.id.message);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        /*
+         Reference: https://developer.android.com/training/basics/fragments/fragment-ui
+         Check that the activity is using the layout version with the movie_grid_fragment_container FrameLayout */
+
+        mTextMessage = (TextView) findViewById(R.id.movie_grid_message);
+
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                switch (item.getItemId()){
+                    case R.id.navigation_popular:
+                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, popularFragment).commit();
+                        return true;
+                    case R.id.navigation_top_rated:
+                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, topRatedFragment).commit();
+                        return true;
+                    case R.id.navigation_now_playing:
+                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, nowPlayingFragment).commit();
+                        return true;
+                }
+            }
+        });
     }
 
     public void loadMoviesData(){
@@ -120,5 +149,10 @@ main activity layout has to have a container for the fragment
                 Log.d("MainActivity", "error loading from API");
             }
         });
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
