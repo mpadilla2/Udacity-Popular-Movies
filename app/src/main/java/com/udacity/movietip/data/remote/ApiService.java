@@ -17,5 +17,7 @@ public interface ApiService {
 
     /* Specify endpoint methods to query the TMDB API. */
     @GET("movie/{apiPath}")
-    Call<MoviesModel> getJSON(@Path("apiPath") String apiPath);
+    Call<MoviesModel> getJSON(@Path("apiPath") String apiPath,
+                              @Query("language") String language,
+                              @Query("page") int pageNum);
 }
