@@ -1,14 +1,14 @@
 package com.udacity.movietip.data.remote;
 
-import com.udacity.movietip.data.model.MoviesModel;
+import com.udacity.movietip.data.model.Movie;
+import com.udacity.movietip.data.model.MoviesIndexed;
 
-import okhttp3.ResponseBody;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import retrofit2.http.Url;
 
 public interface ApiService {
 
@@ -17,7 +17,7 @@ public interface ApiService {
 
     /* Specify endpoint methods to query the TMDB API. */
     @GET("movie/{apiPath}")
-    Call<MoviesModel> getJSON(@Path("apiPath") String apiPath,
-                              @Query("language") String language,
-                              @Query("page") int pageNum);
+    Call<MoviesIndexed> getJSON(@Path("apiPath") String apiPath,
+                                @Query("language") String language,
+                                @Query("page") int pageNum);
 }

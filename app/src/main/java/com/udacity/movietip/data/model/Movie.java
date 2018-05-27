@@ -1,9 +1,15 @@
 package com.udacity.movietip.data.model;
 
+import android.content.res.Resources;
+
+import com.udacity.movietip.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoviesResultsModel {
+import static android.content.res.Resources.*;
+
+public class Movie {
 
         /*
     Using GSON: https://github.com/codepath/android_guides/wiki/Leveraging-the-Gson-Library
@@ -42,11 +48,11 @@ public class MoviesResultsModel {
     private Boolean video;
     private Number voteAverage;
 
-    public MoviesResultsModel(){}
+    public Movie(){}
 
-    public MoviesResultsModel(String posterPath, Boolean isAdult, String plotSynopsis, String releaseDate,
-                              List<Integer> genreIds, Integer id, String originalTitle, String originalLanguage, String title,
-                              String backdropPath, Number popularity, Integer voteCount, Boolean hasVideo, Number voteAverage){
+    public Movie(String posterPath, Boolean isAdult, String plotSynopsis, String releaseDate,
+                 List<Integer> genreIds, Integer id, String originalTitle, String originalLanguage, String title,
+                 String backdropPath, Number popularity, Integer voteCount, Boolean hasVideo, Number voteAverage){
         this.posterPath = posterPath;
         this.adult = isAdult;
         this.overview = plotSynopsis;
@@ -69,6 +75,10 @@ public class MoviesResultsModel {
 
     public String getPosterPath(){
         return posterPath;
+    }
+
+    public String getFullPosterPath() {
+        return getSystem().getString(R.string.image_base_url) + getPosterPath();
     }
 
     public void setAdult(Boolean isAdult){

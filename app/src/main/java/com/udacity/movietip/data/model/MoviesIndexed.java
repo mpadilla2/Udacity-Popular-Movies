@@ -2,7 +2,7 @@ package com.udacity.movietip.data.model;
 
 import java.util.List;
 
-public class MoviesModel {
+public class MoviesIndexed {
 
     /*
     Both Popular and Top Rated Movies API queries have identical JSON Schemas;
@@ -14,7 +14,7 @@ public class MoviesModel {
     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 
     page Integer
-    results List<MoviesResultsModel>
+    results List<Movie>
     totalResults Integer
     totalPages Integer
 
@@ -22,16 +22,16 @@ public class MoviesModel {
      */
 
     private Integer page;
-    private List<MoviesResultsModel> results;
+    private List<Movie> results;
     private Integer totalResults;
     private Integer totalPages;
 
     /**
      * No args constructor for use in serialization
      */
-    public MoviesModel(){}
+    public MoviesIndexed(){}
 
-    public MoviesModel(Integer page, List<MoviesResultsModel> results, Integer totalResults, Integer totalPages){
+    public MoviesIndexed(Integer page, List<Movie> results, Integer totalResults, Integer totalPages){
         this.page = page;
         this.results = results;
         this.totalResults = totalResults;
@@ -46,20 +46,20 @@ public class MoviesModel {
         return page;
     }
 
-    public MoviesModel withPage(Integer page){
+    public MoviesIndexed withPage(Integer page){
         this.page = page;
         return this;
     }
 
-    public void setResults(List<MoviesResultsModel> results){
+    public void setResults(List<Movie> results){
         this.results = results;
     }
 
-    public List<MoviesResultsModel> getResults() {
+    public List<Movie> getResults() {
         return results;
     }
 
-    public MoviesModel withResults(List<MoviesResultsModel> results){
+    public MoviesIndexed withResults(List<Movie> results){
         this.results = results;
         return this;
     }
@@ -72,7 +72,7 @@ public class MoviesModel {
         return totalResults;
     }
 
-    public MoviesModel withTotalResults(Integer totalResults){
+    public MoviesIndexed withTotalResults(Integer totalResults){
         this.totalResults = totalResults;
         return this;
     }
@@ -85,7 +85,7 @@ public class MoviesModel {
         return totalPages;
     }
 
-    public MoviesModel withTotalPages(Integer totalPages){
+    public MoviesIndexed withTotalPages(Integer totalPages){
         this.totalPages = totalPages;
         return this;
     }

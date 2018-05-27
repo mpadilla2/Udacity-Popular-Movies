@@ -1,28 +1,16 @@
 package com.udacity.movietip.ui.activities;
 
-import android.app.FragmentManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.udacity.movietip.R;
-import com.udacity.movietip.data.model.MoviesModel;
-import com.udacity.movietip.data.remote.ApiService;
-import com.udacity.movietip.data.utils.ApiUtils;
 import com.udacity.movietip.ui.fragments.MovieGridFragment;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnFragmentInteractionListener{
 
@@ -65,9 +53,8 @@ main activity layout has to have a container for the fragment
 4. Add the fragment to it's host activity using the FragmentManager and a fragment transaction
      */
 
-    private ApiService mService;
+
     private TextView mTextMessage;
-    private Response<MoviesModel> moviesResponse;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -99,9 +86,7 @@ main activity layout has to have a container for the fragment
         final Fragment topRatedFragment = new MovieGridFragment();
         final Fragment nowPlayingFragment = new MovieGridFragment();
 
-        mService = ApiUtils.getApiService(this);
 
-        loadMoviesData();
 
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
@@ -109,50 +94,16 @@ main activity layout has to have a container for the fragment
 
         mTextMessage = (TextView) findViewById(R.id.movie_grid_message);
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                switch (item.getItemId()){
-                    case R.id.navigation_popular:
-                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, popularFragment).commit();
-                        return true;
-                    case R.id.navigation_top_rated:
-                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, topRatedFragment).commit();
-                        return true;
-                    case R.id.navigation_now_playing:
-                        fragmentTransaction.replace(R.id.movie_grid_fragment_container, nowPlayingFragment).commit();
-                        return true;
-                }
-            }
-        });
+        BottomNavigationView navigationBottom = (BottomNavigationView) findViewById(R.id.navigation);
+        navigationBottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
-    public void loadMoviesData(){
-        // abstract the method further so it's getMoviesObject(String objectType)
-
-        String apiPath = this.getString(R.string.movies_popular_path);
-        mService.getJSON(apiPath).enqueue(new Callback<MoviesModel>() {
-                @Override
-            public void onResponse(Call<MoviesModel> call, Response<MoviesModel> response) {
-                if (response.body() != null) {
-                    moviesResponse = response;
-                    Log.d("MainActivity", "data loaded from API");
-                }else{
-                    Log.d("MainActivity", "null returned from API");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MoviesModel> call, Throwable t) {
-                Log.d("MainActivity", "error loading from API");
-            }
-        });
-    }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+
+
 }
