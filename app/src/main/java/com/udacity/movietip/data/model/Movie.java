@@ -77,10 +77,6 @@ public class Movie {
         return posterPath;
     }
 
-    public String getFullPosterPath() {
-        return getSystem().getString(R.string.image_base_url) + getPosterPath();
-    }
-
     public void setAdult(Boolean isAdult){
         this.adult = isAdult;
     }

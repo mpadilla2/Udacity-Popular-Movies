@@ -6,13 +6,14 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.udacity.movietip.R;
-import com.udacity.movietip.ui.fragments.MovieGridFragment;
+import com.udacity.movietip.ui.fragments.MasterGridFragment;
 
-public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements MasterGridFragment.OnImageClickListener{
 
     /*
     https://www.simplifiedcoding.net/bottom-navigation-android-example
@@ -20,90 +21,102 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     DONE Generify the Interface methods. Test for OK response.
     DONE bottom navigation in main
     DONE listen for clicks and set navigation view accordingly
-    todo fragments for bottom navigation
-    TODO Add a recycler view. Test for Ok response.
-    TODO Display data in recyclerview gridview.
-    TODO Respond to click with toast message.
+    DONE fragments for bottom navigation
+    DONE Add a recycler view. Test for Ok response.
+    DONE Display data in recyclerview gridview.
+    DONE Respond to click with toast message.
     TODO Design details fragment.
     TODO On click display details activity.
+    TODO Handle null pointer exceptions
+    TODO Check for nulls
+    TODO Polish the api
+    TODO What is strings.xml supposed to hold? strings.xml translatable
+    TODO Tablet layout
+    TODO Debugging and linting
 
-    Inside the fragment layout, fragment_movie_grid, I will define the recycler view.
-    Inside the MovieGridFragment, I will inflate the fragment_movie_grid
-	get a reference to the recycler view inside the fragment layout
-	add a click listener to handle clicks on the individual posters
 	use parcelable to create a parcel to use in saving state
 	override onSaveInstanceState to save state for each fragment's parcel
 Inside the MainActivity:
 	check for a saved instance state, if it exists: unpack the parcel and restore the savedInstanceState objects
-		else instantiate a MovieGridFragment for each: popular, top rated, and favorites
+		else instantiate a MasterGridFragment for each: popular, top rated, and favorites
 		instantiated fragment passes static final string to recycler view to obtain data
-Inside the interface
-	if the passed in static final string matches then (have abstracted and provided methods for popular and toprated)
-		query the api
-Inside the Recycler View class:
-	Abstract so each fragment can instantiate their own recycler view.
-	Connect to the interface to query for the data to display by passing the static final string to the interface
-Lesson 7 and 12 Background Tasks talks about loaders rewatch these and implement the loading here
-	Exercise: T05b.02-Exercise-AddAsyncTaskLoader
 
-1. Create a layout that defines the appearance of the fragment
-2. Create a new fragment class that inflates a layout
-main activity layout has to have a container for the fragment
-3. Create a new fragment instance in a host activity (MainActivity)
-4. Add the fragment to it's host activity using the FragmentManager and a fragment transaction
      */
 
+    private static final String TAG = "MainActivity";
 
     private TextView mTextMessage;
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_popular:
-                    return true;
-                case R.id.navigation_top_rated:
-                    return true;
-                case R.id.navigation_now_playing:
-                    return true;
-                case R.id.navigation_favorites:
-                    return true;
-            }
-            return false;
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-
-        final Fragment popularFragment = new MovieGridFragment();
-        final Fragment topRatedFragment = new MovieGridFragment();
-        final Fragment nowPlayingFragment = new MovieGridFragment();
-
-
-
+        Log.d(TAG, "onCreated started");
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
          Check that the activity is using the layout version with the movie_grid_fragment_container FrameLayout */
 
-        mTextMessage = (TextView) findViewById(R.id.movie_grid_message);
+        /* Default initial fragment creation to the popular movies category
+        *  TODO restore last bottomnavigation item user was viewing else init fragment with popular movies */
+
+        // If I uncomment this then it crashes with "The specified child already has a parent. You must call removeView() on the child's parent first.
+        initFragment(new MasterGridFragment().newInstance(getString(R.string.movies_popular_path)));
+
+        Log.d(TAG, "onCreate init default fragment.");
 
         BottomNavigationView navigationBottom = (BottomNavigationView) findViewById(R.id.navigation);
         navigationBottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        Log.d(TAG, "onCreate bottom navigation view set up finished.");
     }
 
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            Fragment fragment = null;
+
+            switch (item.getItemId()) {
+                case R.id.navigation_popular:
+                    // Provide argument to fragment constructor to build fragment and call correct api path
+                    // Reference: https://developer.android.com/reference/android/app/Fragment
+                    fragment = new MasterGridFragment().newInstance(getString(R.string.movies_popular_path));
+                    Log.d(TAG, "Popular Fragment created.");
+                    break;
+                case R.id.navigation_top_rated:
+                    fragment = new MasterGridFragment().newInstance(getString(R.string.movies_top_rated_path));
+                    Log.d(TAG, "Top Rated Fragment created.");
+                    break;
+                case R.id.navigation_now_playing:
+                    fragment = new MasterGridFragment().newInstance(getString(R.string.movies_now_playing_path));
+                    Log.d(TAG, "Now Playing Fragment created.");
+                    break;
+                /*case R.id.navigation_favorites:
+                    fragment = new MasterGridFragment();
+                    break;*/
+            }
+            return initFragment(fragment);
+        }
+    };
+
+
+
+    // Reference: https://www.simplifiedcoding.net/bottom-navigation-android-example/
+    private boolean initFragment(Fragment fragment){
+        if (fragment != null){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
+            return true;
+        }
+        return false;
+    }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void onImageSelected(int position) {
 
     }
-
-
-
 }

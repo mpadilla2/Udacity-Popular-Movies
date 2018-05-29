@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.udacity.movietip.R;
-import com.udacity.movietip.data.adapters.MasterListAdapter;
-import com.udacity.movietip.data.adapters.MasterListAdapter.GridItemClickListener;
+import com.udacity.movietip.data.adapters.MasterGridAdapter;
+import com.udacity.movietip.data.adapters.MasterGridAdapter.GridItemClickListener;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.remote.ApiService;
@@ -30,24 +30,29 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MasterListFragment extends Fragment {
-    private static final String TAG = "MasterListFragment";
+public class MasterGridFragment extends Fragment {
+    private static final String TAG = "MasterGridFragment";
 
+    private String mCategory;
     private Context mContext;
     private MoviesIndexed mMoviesIndexed;
     private List<Movie> mMovieList;
-    private MasterListAdapter mAdapter;
+    private MasterGridAdapter mAdapter;
 
-    // Define a new interface OnImageClickListener that triggers a callback in the host activity
-    OnImageClickListener mCallback;
+    /* Create a new instance of MasterGridFragment, providing "category" as an argument.
+     * Reference: https://developer.android.com/reference/android/app/Fragment */
+    public MasterGridFragment newInstance(String category){
+        MasterGridFragment masterGridFragment = new MasterGridFragment();
 
-    // OnImageClickListener interface, calls a method in the host activity name onImageSelected
-    public interface OnImageClickListener{
-        void onImageSelected(int position);
+        // Supply category input as an argument.
+        Bundle args = new Bundle();
+        args.putString("category", category);
+        masterGridFragment.setArguments(args);
+
+        return masterGridFragment;
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -62,17 +67,15 @@ public class MasterListFragment extends Fragment {
         }
     }
 
-    //Mandatory empty constructor
-    public MasterListFragment(){
-
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate started");
 
-        if (isActiveNetwork()) loadMovies(getString(R.string.movies_popular_path));
+        // Grab the category argument passed in or else default to popular movies category
+        mCategory = getArguments() != null ? getArguments().getString("category") : getString(R.string.movies_popular_path);
+        // make the tmdb api call with the appropriate category for the fragment and thus the bottom navigation view in main activity
+        if (isActiveNetwork()) loadMovies(mCategory);
     }
 
     @Override
@@ -82,7 +85,7 @@ public class MasterListFragment extends Fragment {
         Log.d(TAG, "onCreateView started");
 
         // Inflates the RecyclerView grid layout of all movie images
-        final View rootView = inflater.inflate(R.layout.fragment_master_list, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_master_grid, container, false);
         RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.images_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
@@ -91,13 +94,14 @@ public class MasterListFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mMovieList = new ArrayList<>();
-        // instantiate custom MasterListAdapter and custom click listener
+        // instantiate custom MasterGridAdapter and custom click listener
         // Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
-        mAdapter = new MasterListAdapter(getActivity(), mMovieList, new GridItemClickListener() {
+        mAdapter = new MasterGridAdapter(getActivity(), mMovieList, new GridItemClickListener() {
             @Override
             public void onGridItemClick(View v, int clickedItemIndex) {
                 Log.d(TAG, "clicked position is " + clickedItemIndex);
                 int movieId = mMovieList.get(clickedItemIndex).getId();
+                Toast.makeText(getActivity(), "Movie Name is: " + mMovieList.get(clickedItemIndex).getOriginalTitle(), Toast.LENGTH_SHORT).show();
                 // todo now need to launch an intent to display movie details
             }
         });
@@ -106,6 +110,14 @@ public class MasterListFragment extends Fragment {
 
         // Return the root view
         return rootView;
+    }
+
+    // Define a new interface OnImageClickListener that triggers a callback in the host activity
+    OnImageClickListener mCallback;
+
+    // OnImageClickListener interface, calls a method in the host activity name onImageSelected
+    public interface OnImageClickListener{
+        void onImageSelected(int position);
     }
 
     public void loadMovies(String category){
