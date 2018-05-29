@@ -1,5 +1,6 @@
 package com.udacity.movietip.ui.activities;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,9 +10,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.movietip.R;
+import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.ui.fragments.MasterGridFragment;
+
+import java.util.ArrayList;
+
+import okhttp3.Interceptor;
 
 public class MainActivity extends AppCompatActivity implements MasterGridFragment.OnImageClickListener{
 
@@ -27,11 +34,12 @@ public class MainActivity extends AppCompatActivity implements MasterGridFragmen
     DONE Respond to click with toast message.
     TODO Design details fragment.
     TODO On click display details activity.
+    TODO Horizontal layout
     TODO Handle null pointer exceptions
     TODO Check for nulls
     TODO Polish the api
     TODO What is strings.xml supposed to hold? strings.xml translatable
-    TODO Tablet layout
+    TODO LATER Tablet layout?? No
     TODO Debugging and linting
 
 	use parcelable to create a parcel to use in saving state
@@ -109,6 +117,7 @@ Inside the MainActivity:
         if (fragment != null){
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
                     .commit();
             return true;
         }
@@ -116,7 +125,12 @@ Inside the MainActivity:
     }
 
     @Override
-    public void onImageSelected(int position) {
+    public void onImageSelected(Movie movie) {
+        Toast.makeText(this, "Movie clicked is " + movie.getOriginalTitle(), Toast.LENGTH_SHORT).show();
 
+        final Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("Movie Item", movie);
+
+        startActivity(intent);
     }
 }

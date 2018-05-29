@@ -2,6 +2,7 @@ package com.udacity.movietip.data.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import java.util.List;
 public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.MovieViewHolder>{
 
     private static final String TAG = "MasterGridAdapter";
-    private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
+    //private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
 
     final private GridItemClickListener mOnClickListener;
 
@@ -70,8 +71,13 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
            Reference: ic_broken_image made by https://www.flaticon.com/authors/those-icons and is licensed by http://creativecommons.org/licenses/by/3.0/
            Reference: ic_image_loading icon made by https://www.flaticon.com/authors/dave-gandy and is licensed by http://creativecommons.org/licenses/by/3.0/
          */
+
+        String posterUrl = mMoviesList.get(position).getPosterUrl();
+
+        Log.d(TAG, "Poster URL contains: " + posterUrl);
+
         Glide.with(mContext)
-                .load(IMAGE_BASE_URL + mMoviesList.get(position).getPosterPath())
+                .load(mMoviesList.get(position).getPosterUrl())
                 .apply(new RequestOptions()
                         .centerCrop()
                         .placeholder(R.drawable.ic_image_loading)

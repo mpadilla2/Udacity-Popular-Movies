@@ -24,6 +24,7 @@ import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,11 +34,9 @@ import retrofit2.Response;
 public class MasterGridFragment extends Fragment {
     private static final String TAG = "MasterGridFragment";
 
-    private String mCategory;
     private Context mContext;
-    private MoviesIndexed mMoviesIndexed;
-    private List<Movie> mMovieList;
     private MasterGridAdapter mAdapter;
+    private ArrayList<Movie> mMovieList;
 
     /* Create a new instance of MasterGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment */
@@ -70,10 +69,12 @@ public class MasterGridFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d(TAG, "onCreate started");
 
-        // Grab the category argument passed in or else default to popular movies category
-        mCategory = getArguments() != null ? getArguments().getString("category") : getString(R.string.movies_popular_path);
+        // Grab the category argument passed in or else default to popular movies category to create new fragment
+        String mCategory = getArguments() != null ? getArguments().getString("category") : getString(R.string.movies_popular_path);
+
         // make the tmdb api call with the appropriate category for the fragment and thus the bottom navigation view in main activity
         if (isActiveNetwork()) loadMovies(mCategory);
     }
@@ -93,16 +94,16 @@ public class MasterGridFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager = new StaggeredGridLayoutManager(2, 1);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mMovieList = new ArrayList<>();
+        final List<Movie> movieList = new ArrayList<>();
         // instantiate custom MasterGridAdapter and custom click listener
         // Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
-        mAdapter = new MasterGridAdapter(getActivity(), mMovieList, new GridItemClickListener() {
+        mAdapter = new MasterGridAdapter(getActivity(), movieList, new GridItemClickListener() {
             @Override
             public void onGridItemClick(View v, int clickedItemIndex) {
                 Log.d(TAG, "clicked position is " + clickedItemIndex);
-                int movieId = mMovieList.get(clickedItemIndex).getId();
-                Toast.makeText(getActivity(), "Movie Name is: " + mMovieList.get(clickedItemIndex).getOriginalTitle(), Toast.LENGTH_SHORT).show();
-                // todo now need to launch an intent to display movie details
+                //int movieId = movieList.get(clickedItemIndex).getId();
+                Movie movie = movieList.get(clickedItemIndex);
+                mCallback.onImageSelected(movie);
             }
         });
 
@@ -117,7 +118,7 @@ public class MasterGridFragment extends Fragment {
 
     // OnImageClickListener interface, calls a method in the host activity name onImageSelected
     public interface OnImageClickListener{
-        void onImageSelected(int position);
+        void onImageSelected(Movie movie);
     }
 
     public void loadMovies(String category){
@@ -132,7 +133,6 @@ public class MasterGridFragment extends Fragment {
             @Override
             public void onResponse(Call<MoviesIndexed> call, Response<MoviesIndexed> response) {
                 if (response.body() != null) {
-                    mMoviesIndexed = response.body();
                     List<Movie> movieList = response.body().getResults();
                     mAdapter.setMoviesList(movieList);
                     Log.d(TAG, "data loaded from API");
@@ -162,4 +162,9 @@ public class MasterGridFragment extends Fragment {
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putParcelableArrayList("movies", mMovieList);
+        super.onSaveInstanceState(outState);
+    }
 }
