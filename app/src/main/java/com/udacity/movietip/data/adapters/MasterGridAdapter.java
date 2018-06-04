@@ -1,6 +1,7 @@
 package com.udacity.movietip.data.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,12 +20,11 @@ import java.util.List;
 public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.MovieViewHolder>{
 
     private static final String TAG = "MasterGridAdapter";
-    //private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w185";
 
     final private GridItemClickListener mOnClickListener;
 
     private List<Movie> mMoviesList;
-    private Context mContext;
+    private final Context mContext;
 
     // Reference: Udacity Android Developer Nanodegree Program > Developing Android Apps > Lesson 4: RecyclerView > Part 20. Responding to Clicks
     public interface GridItemClickListener {
@@ -37,7 +37,7 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
         MovieViewHolder(View view){
             super(view);
 
-            posterImage = (ImageView) view.findViewById(R.id.movie_poster_imageView);
+            posterImage = view.findViewById(R.id.movie_poster_imageView);
             posterImage.setOnClickListener(this);
         }
 
@@ -55,31 +55,28 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
     }
 
     // Create new views as invoked by the layout manager
+    @NonNull
     @Override
-    public MasterGridAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movie_item, parent, false);
+    public MasterGridAdapter.MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_item, parent, false);
         return new MovieViewHolder(view);
     }
 
     // Replace the contents of a view as invoked by the layout manager
     @Override
-    public void onBindViewHolder(MasterGridAdapter.MovieViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MasterGridAdapter.MovieViewHolder holder, int position) {
 
         /* Use Glide to load the images from the internet
            Reference: https://github.com/bumptech/glide
-           Reference: https://stackoverflow.com/questions/45481756/glide-4-0-0-missing-placeholder-error-glideapp-and-does-not-resolve-its-method
            Reference: ic_broken_image made by https://www.flaticon.com/authors/those-icons and is licensed by http://creativecommons.org/licenses/by/3.0/
            Reference: ic_image_loading icon made by https://www.flaticon.com/authors/dave-gandy and is licensed by http://creativecommons.org/licenses/by/3.0/
          */
 
         String posterUrl = mMoviesList.get(position).getPosterUrl();
 
-        Log.d(TAG, "Poster URL contains: " + posterUrl);
-
         Glide.with(mContext)
                 .load(mMoviesList.get(position).getPosterUrl())
                 .apply(new RequestOptions()
-                        .centerCrop()
                         .placeholder(R.drawable.ic_image_loading)
                         .error(R.drawable.ic_broken_image))
                 .into(holder.posterImage);

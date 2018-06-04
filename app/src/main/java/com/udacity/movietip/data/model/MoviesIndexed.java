@@ -6,19 +6,12 @@ public class MoviesIndexed {
 
     /*
     Both Popular and Top Rated Movies API queries have identical JSON Schemas;
-    So abstract to Generic Movies Object.
+    So use Generic Movies Object.
 
     Using GSON: https://github.com/codepath/android_guides/wiki/Leveraging-the-Gson-Library
     If the class fields match the JSON keys, GSON will map automatically.
     OR
     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-
-    page Integer
-    results List<Movie>
-    totalResults Integer
-    totalPages Integer
-
-
      */
 
     private Integer page;

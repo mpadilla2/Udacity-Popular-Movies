@@ -1,17 +1,11 @@
 package com.udacity.movietip.data.model;
 
-import android.content.res.Resources;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
 
-import com.udacity.movietip.R;
-
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.res.Resources.*;
 
 public class Movie implements Parcelable {
 
@@ -29,25 +23,23 @@ public class Movie implements Parcelable {
     private Boolean adult;
     private String overview;
     private String releaseDate;
-    private List<Integer> genreIds = new ArrayList<Integer>();
+    private List<Integer> genreIds = new ArrayList<>();
     private Integer id;
     private String originalTitle;
     private String originalLanguage;
     private String title;
     private String backdropPath;
-    private Number popularity;
+    private Double popularity;
     private Integer voteCount;
     private Boolean video;
-    private BigDecimal voteAverage;
-    private String posterUrl;
-    private String backdropUrl;
+    private Float voteAverage;
 
 
     public Movie(){}
 
     public Movie(String posterPath, Boolean isAdult, String plotSynopsis, String releaseDate,
                  List<Integer> genreIds, Integer id, String originalTitle, String originalLanguage, String title,
-                 String backdropPath, Number popularity, Integer voteCount, Boolean hasVideo, BigDecimal voteAverage){
+                 String backdropPath, Double popularity, Integer voteCount, Boolean hasVideo, Float voteAverage){
         this.posterPath = posterPath;
         this.adult = isAdult;
         this.overview = plotSynopsis;
@@ -152,11 +144,11 @@ public class Movie implements Parcelable {
         return IMAGE_BASE_URL + BACKDROP_SIZE + backdropPath;
     }
 
-    public void setPopularity(Number popularity){
+    public void setPopularity(Double popularity){
         this.popularity = popularity;
     }
 
-    public Number getPopularity() {
+    public Double getPopularity() {
         return popularity;
     }
 
@@ -176,11 +168,11 @@ public class Movie implements Parcelable {
         return video;
     }
 
-    public void setVoteAverage(BigDecimal voteAverage){
+    public void setVoteAverage(Float voteAverage){
         this.voteAverage = voteAverage;
     }
 
-    public BigDecimal getVoteAverage() {
+    public Float getVoteAverage() {
         return voteAverage;
     }
 
@@ -209,24 +201,24 @@ public class Movie implements Parcelable {
         dest.writeSerializable(this.voteAverage);
     }
 
-    protected Movie(Parcel in) {
+    private Movie(Parcel in) {
         this.posterPath = in.readString();
         this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.overview = in.readString();
         this.releaseDate = in.readString();
-        this.genreIds = new ArrayList<Integer>();
+        this.genreIds = new ArrayList<>();
         in.readList(this.genreIds, Integer.class.getClassLoader());
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.originalTitle = in.readString();
         this.originalLanguage = in.readString();
         this.title = in.readString();
         this.backdropPath = in.readString();
-        this.popularity = (Number) in.readSerializable();
+        this.popularity = (Double) in.readSerializable();
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
         this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.voteAverage = (BigDecimal) in.readSerializable();
-        this.posterUrl = in.readString();
-        this.backdropUrl = in.readString();
+        this.voteAverage = (Float) in.readSerializable();
+        String posterUrl = in.readString();
+        String backdropUrl = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

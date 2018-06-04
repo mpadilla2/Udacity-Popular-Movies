@@ -6,7 +6,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -22,26 +25,36 @@ import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.ui.activities.MainActivity;
+import com.udacity.movietip.ui.utils.RecyclerViewItemMargins;
 
+import java.lang.ref.Reference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MasterGridFragment extends Fragment {
+public class MasterGridFragment extends Fragment{
     private static final String TAG = "MasterGridFragment";
+    private static final String MOVIES_LIST = "movies_list";
+    private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
+    private static final String MOVIES_POPULAR_PATH = "popular";
 
     private Context mContext;
+    private RecyclerView mRecyclerView;
     private MasterGridAdapter mAdapter;
     private ArrayList<Movie> mMovieList;
 
     /* Create a new instance of MasterGridFragment, providing "category" as an argument.
-     * Reference: https://developer.android.com/reference/android/app/Fragment */
+     * Reference: https://developer.android.com/reference/android/app/Fragment
+     * Begin Fragment newInstance()
+     */
     public MasterGridFragment newInstance(String category){
         MasterGridFragment masterGridFragment = new MasterGridFragment();
+
+        mContext = getContext();
 
         // Supply category input as an argument.
         Bundle args = new Bundle();
@@ -50,6 +63,8 @@ public class MasterGridFragment extends Fragment {
 
         return masterGridFragment;
     }
+    /* End Fragment newInstance()*/
+
 
     // Override onAttach to make sure that the container activity has implemented the callback
     @Override
@@ -66,105 +81,114 @@ public class MasterGridFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate started");
+        // Grab the category argument used to create new fragment or else default to popular movies category
+        String mCategory = getArguments() != null ? getArguments().getString("category") : MOVIES_POPULAR_PATH;
 
-        // Grab the category argument passed in or else default to popular movies category to create new fragment
-        String mCategory = getArguments() != null ? getArguments().getString("category") : getString(R.string.movies_popular_path);
-
-        // make the tmdb api call with the appropriate category for the fragment and thus the bottom navigation view in main activity
-        if (isActiveNetwork()) loadMovies(mCategory);
+        // If the network is available, make the tmdb api call with the appropriate category for the fragment
+        if (isActiveNetwork()){
+            loadMovies(mCategory);
+        } else {
+            Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
+        }
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        Log.d(TAG, "onCreateView started");
-
         // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_master_grid, container, false);
-        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.images_recycler_view);
+        mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        // Instantiate and set the RecyclerView LayoutManager to a StaggerdGrid
-        RecyclerView.LayoutManager mLayoutManager = new StaggeredGridLayoutManager(2, 1);
+        // Instantiate and set the RecyclerView LayoutManager to a grid with 3 columns
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        /* Instantiate custom MasterGridAdapter and custom click listener
+           Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
+           Begin Adapter/Click Listener
+         */
         final List<Movie> movieList = new ArrayList<>();
-        // instantiate custom MasterGridAdapter and custom click listener
-        // Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
         mAdapter = new MasterGridAdapter(getActivity(), movieList, new GridItemClickListener() {
             @Override
             public void onGridItemClick(View v, int clickedItemIndex) {
-                Log.d(TAG, "clicked position is " + clickedItemIndex);
-                //int movieId = movieList.get(clickedItemIndex).getId();
                 Movie movie = movieList.get(clickedItemIndex);
                 mCallback.onImageSelected(movie);
             }
         });
+        // End Adapter/Click Listener
+
+        // recyclerview spacing 11:34 to 14:50
 
         mRecyclerView.setAdapter(mAdapter);
 
-        // Return the root view
         return rootView;
     }
 
+
     // Define a new interface OnImageClickListener that triggers a callback in the host activity
-    OnImageClickListener mCallback;
+    private OnImageClickListener mCallback;
+
 
     // OnImageClickListener interface, calls a method in the host activity name onImageSelected
     public interface OnImageClickListener{
         void onImageSelected(Movie movie);
     }
 
-    public void loadMovies(String category){
 
-        Log.d(TAG, "loadMovies started");
+    private void loadMovies(String category){
 
         String language = "en_US";
         int pageNum = 1;
 
-        ApiService mService = ApiUtils.getApiService(getContext());
+        ApiService mService = ApiUtils.getApiService(mContext);
         mService.getJSON(category, language, pageNum).enqueue(new Callback<MoviesIndexed>() {
             @Override
-            public void onResponse(Call<MoviesIndexed> call, Response<MoviesIndexed> response) {
+            public void onResponse(@NonNull Call<MoviesIndexed> call, @NonNull Response<MoviesIndexed> response) {
                 if (response.body() != null) {
                     List<Movie> movieList = response.body().getResults();
                     mAdapter.setMoviesList(movieList);
-                    Log.d(TAG, "data loaded from API");
                 }else{
                     Toast.makeText(getActivity(), "Oops! No movies returned!", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "null returned from API");
                 }
             }
 
             @Override
-            public void onFailure(Call<MoviesIndexed> call, Throwable t) {
-                Toast.makeText(getContext(), getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "error loading from API");
+            public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
+                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
-    public boolean isActiveNetwork(){
 
-        Log.d(TAG, "isActiveNetwork started");
+    /* Begin Connectivity Monitoring
+       Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
+     */
+    private boolean isActiveNetwork(){
 
         ConnectivityManager connectivityManager =
                 (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
+    /* End Connectivity Monitoring */
+
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putParcelableArrayList("movies", mMovieList);
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(MOVIES_LIST, mMovieList);
+
     }
 }

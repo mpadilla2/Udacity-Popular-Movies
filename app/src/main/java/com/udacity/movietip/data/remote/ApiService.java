@@ -1,9 +1,6 @@
 package com.udacity.movietip.data.remote;
 
-import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
