@@ -24,6 +24,7 @@ allprojects {
     repositories {
         mavenCentral()
         google()
+        maven { url "https://jitpack.io" }
         maven { url 'https://maven.google.com' }
         // If you're using a version of Gradle lower than 4.1, you must instead use:
         // maven {

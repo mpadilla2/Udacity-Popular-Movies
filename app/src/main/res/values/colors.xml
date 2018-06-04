@@ -5,4 +5,5 @@
     <color name="colorAccent">#4075a2</color>
     <color name="colorNavIcon">#dae9f6</color>
     <color name="colorNavText">#01294b</color>
+    <color name="white">#ffffff</color>
 </resources>

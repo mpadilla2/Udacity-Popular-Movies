@@ -2,6 +2,7 @@ package com.udacity.movietip.ui.activities;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -76,6 +77,20 @@ Inside the MainActivity:
          Check that the activity is using the layout version with the movie_grid_fragment_container FrameLayout */
         navigationBottom = findViewById(R.id.navigation);
         navigationBottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+
+        // Reference: https://stackoverflow.com/a/44849095
+        // Show/hide BottomNavigationView - this "seems" a more elegant solution than overriding coordinatorlayout.behavior
+        // Reference: https://developer.android.com/reference/android/support/design/widget/AppBarLayout.OnOffsetChangedListener
+        ((AppBarLayout)findViewById(R.id.app_bar_layout))
+                .addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                navigationBottom.setTranslationY(verticalOffset*-1);
+                navigationBottom.setTranslationY(verticalOffset*-1);
+            }
+        });
+
 
         /* Default initial fragment creation to the popular movies category*/
         if (savedInstanceState == null) {
