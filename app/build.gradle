@@ -34,27 +34,21 @@ allprojects {
     }
 }
 
-// with 27.1.1 I get: java.lang.IllegalStateException: ViewHolder views must not be attached when created.
-// Ensure that you are not passing 'true' to the attachToRoot parameter of LayoutInflater.inflate(..., boolean attachToRoot)
-// In my app attachToRoot is false. I didn't have this problem with previous sdk versions. So I'm using 27.0.2.
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    // Have to use beta as there are bugs in regards to constraint inside nestedscrollview, which is what I'm doing.
-    // Reference: https://stackoverflow.com/a/48301009
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
 
-    // http calls. not targeting oreo so not using 2.3.0 or greater
+    // http calls
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
 
     // json parsing and conversion to object
     implementation 'com.google.code.gson:gson:2.8.4'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
-    // interceptor to inject api key to all api calls. removed 3.10.0 to test if it's the one using sdk 27.1.1
+    // interceptor to inject api key to all api calls
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 
     // BottomNavigationView
@@ -62,7 +56,6 @@ dependencies {
     implementation 'com.android.support:support-vector-drawable:27.1.1'
 
     // Loading images from internet.
-    // Removed 4.7.1 to test if its' the one using sdk 27.1.1. Yes it is. For 4.6.1 it uses 27.0.2
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 
