@@ -21,55 +21,25 @@ public class MainActivity extends AppCompatActivity implements MasterGridFragmen
     /*
     https://www.simplifiedcoding.net/bottom-navigation-android-example
     https://materialdoc.com/components/bottom-navigation/
-    DONE Generify the Interface methods. Test for OK response.
-    DONE bottom navigation in main
-    DONE listen for clicks and set navigation view accordingly
-    DONE fragments for bottom navigation
-    DONE Add a recycler view. Test for Ok response.
-    DONE Display data in recyclerview gridview.
-    DONE Respond to click with toast message.
-    DONE Design details fragment: Add rating bar and other information with divider
-    TODO vote average comes in as Vote Average is: 7.4. But my 5 stars shows as 5 stars. what's the math to get 5 stars to work?
-    DONE popularity rating is wrapping vertically
-    DONE What are the dimensions of the poster? Don't center crop, dynamically size the poster view.
-    DONE put glide image loading into separate helper class
-    DONE On click display details activity.
-    DONE implement up navigation for detail activity
-    DONE implement up navigation for fragments??? No, per material design it should just exit the app.
-    DONE Where should I do the check if online? Am I loading the images in the right place? If I'm offline, Glide still tries to load the posters and the backdrop.
-    TODO doesn't crash when not online but shows broken imageplaceholder in detailactivity for backdrop image only. use glide target?
-    TODO doesn't crash when not online but shows broken imageplaceholder in viewholder's that were not visible when connection went down
-    TODO crashes: load app; then put in plane mode; tap top rate and now playing appropriate not connected message pops; connect to internet; tap top rated and now playing NOTHING GETS CREATED.
-    DONE Horizontal layout
-    TODO Handle null pointer exceptions
-    DONE Check for nulls
-    TODO Polish the api
-    TODO What is strings.xml supposed to hold? strings.xml translatable
-    DONE LATER Tablet layout?? No
-    TODO Debugging and linting
-    TODO to get rid of topbar (actionbar) need to apply parent theme in style.xml to one that is noactionbar. then I can do a collapsing toolbar with the app_name in coordinator layout. https://www.youtube.com/watch?v=f4kpysbsIeI
 
-	use parcelable to create a parcel to use in saving state
-	override onSaveInstanceState to save state for each fragment's parcel
-Inside the MainActivity:
-	check for a saved instance state, if it exists: unpack the parcel and restore the savedInstanceState objects
-		else instantiate a MasterGridFragment for each: popular, top rated, and favorites
-		instantiated fragment passes static final string to recycler view to obtain data
+    TODO Handle null pointer exceptions
+    TODO What is strings.xml supposed to hold? strings.xml translatable
+    TODO Debugging and linting
 
      */
 
-    private static final String TAG = "MainActivity";
-    public static final String MOVIE_ITEM = "Movie Item";
-    public static final String MOVIES_POPULAR_PATH = "popular";
-    public static final String MOVIES_TOP_RATED_PATH = "top_rated";
-    public static final String MOVIES_NOW_PLAYING_PATH = "now_playing";
-    BottomNavigationView navigationBottom;
+    private static final String MOVIE_ITEM = "Movie Item";
+    private static final String MOVIES_POPULAR_PATH = "popular";
+    private static final String MOVIES_TOP_RATED_PATH = "top_rated";
+    private static final String MOVIES_NOW_PLAYING_PATH = "now_playing";
+    private BottomNavigationView navigationBottom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // For testing glide when network is down
         Glide.get(this).clearMemory();
 
         /*
@@ -79,14 +49,15 @@ Inside the MainActivity:
         navigationBottom.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
 
-        // Reference: https://stackoverflow.com/a/44849095
-        // Show/hide BottomNavigationView - this "seems" a more elegant solution than overriding coordinatorlayout.behavior
-        // Reference: https://developer.android.com/reference/android/support/design/widget/AppBarLayout.OnOffsetChangedListener
+        /* Reference: https://stackoverflow.com/a/44849095
+         * Show/hide BottomNavigationView - this "seems" a more elegant solution than overriding coordinatorlayout behavior. Maybe that's premature or naive at this point?
+         * Reference: https://developer.android.com/reference/android/support/design/widget/AppBarLayout.OnOffsetChangedListener
+         */
         ((AppBarLayout)findViewById(R.id.app_bar_layout))
                 .addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                navigationBottom.setTranslationY(verticalOffset*-1);
+                // move Bottom navigation view in the opposite direction of the appbar on the y axis.
                 navigationBottom.setTranslationY(verticalOffset*-1);
             }
         });
@@ -120,6 +91,7 @@ Inside the MainActivity:
                     tag = MOVIES_NOW_PLAYING_PATH;
                     break;
             }
+
             return initFragment(tag);
         }
     };
@@ -138,15 +110,18 @@ Inside the MainActivity:
 
         Fragment taggedFragment;
         taggedFragment = fragmentManager.findFragmentByTag(tag);
+        Boolean flag = true;
 
         if (taggedFragment == null) {
             taggedFragment = new MasterGridFragment().newInstance(tag);
+            flag = false;
         }
 
         fragmentTransaction
                 .replace(R.id.fragment_container, taggedFragment, tag)
                 .commit();
-        return true;
+
+        return flag;
     }
 
     @Override
@@ -154,7 +129,6 @@ Inside the MainActivity:
 
         final Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(MOVIE_ITEM, movie);
-
         startActivity(intent);
     }
 }

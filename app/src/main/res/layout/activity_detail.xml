@@ -1,156 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.activities.DetailActivity">
+    tools:context=".ui.activities.DetailActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-        <android.support.constraint.ConstraintLayout
+
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-                <ImageView
-                    android:id="@+id/detail_movie_backdrop_imageView"
-                    android:layout_width="0dp"
-                    android:layout_height="180dp"
-                    android:src="@drawable/ic_thumb_up_black_24dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@string/detail_movie_backdrop_image"
-                    tools:ignore="InconsistentLayout" />
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-                <ImageView
-                android:id="@+id/detail_movie_poster_imageView"
-                android:layout_width="120dp"
-                android:layout_height="170dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="132dp"
-                android:src="@drawable/ic_image_loading"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                    android:contentDescription="@string/detail_movie_poster" />
 
-                <TextView
-                android:id="@+id/detail_movie_name_textView"
-                android:layout_width="205dp"
+            <ImageView
+                android:id="@+id/detail_movie_backdrop_imageView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:fontFamily="sans-serif-smallcaps"
-                android:text="@string/detail_movie_name"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.09"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_poster_imageView"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_backdrop_imageView" />
+                android:contentDescription="@string/detail_movie_backdrop_image"
+                android:minHeight="180dp"
+                android:src="@drawable/ic_thumb_up_black_24dp"
+                app:layout_collapseMode="parallax"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed" />
 
-                <TextView
-                android:id="@+id/detail_movie_release_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/detail_movie_date"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_release_date_label"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_poster_imageView" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:layout_collapseMode="pin"/>
 
-                <TextView
-                android:id="@+id/detail_movie_release_date_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:text="@string/detail_movie_release_date"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_poster_imageView" />
+        </android.support.design.widget.CollapsingToolbarLayout>
 
-                <TextView
-                android:id="@+id/detail_movie_overview"
-                android:layout_width="342dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/detail_movie_overview_text"
-                android:typeface="monospace"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_release_date_label" />
+    </android.support.design.widget.AppBarLayout>
 
-                <RatingBar
-                android:id="@+id/movie_detail_vote_average"
-                style="?android:attr/ratingBarStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:isIndicator="true"
-                android:numStars="5"
-                android:stepSize=".10"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_poster_imageView"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_name_textView" />
+    <!-- fillViewport is needed to stretch constraintlayout height to the fill the viewport.
+     Otherwise we see a large white space on the bottom of the constraintlayout content.
+     https://developer.android.com/reference/android/support/v4/widget/NestedScrollView -->
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-                <TextView
-                android:id="@+id/detail_movie_vote_count_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/detail_movie_votes"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_vote_count_textView"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_name_textView" />
+        <include layout="@layout/scrolling_content"/>
 
-                <TextView
-                android:id="@+id/detail_movie_vote_count_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/detail_movie_vote_count"
-                app:layout_constraintStart_toEndOf="@+id/movie_detail_vote_average"
-                app:layout_constraintTop_toBottomOf="@+id/detail_movie_name_textView" />
+    </android.support.v4.widget.NestedScrollView>
 
-                <TextView
-                android:id="@+id/detail_movie_popularity_rank_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/detail_movie_popularity_rank_label"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_poster_imageView"
-                app:layout_constraintTop_toBottomOf="@+id/movie_detail_vote_average" />
-
-                <TextView
-                android:id="@+id/detail_movie_popularity_rank_textView"
-                android:layout_width="97dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8dp"
-                android:text="@string/detail_movie_popularity_rank_textView"
-                app:layout_constraintStart_toEndOf="@+id/detail_movie_popularity_rank_label"
-                app:layout_constraintTop_toBottomOf="@+id/movie_detail_vote_average" />
-
-                <!--<ImageView
-                android:layout_width="382dp"
-                android:layout_height="331dp"
-                android:layout_marginTop="180dp"
-                android:src="@drawable/ic_star_black_24dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/detail_movie_backdrop_imageView" />-->
-
-        </android.support.constraint.ConstraintLayout>
-</ScrollView>
+</android.support.design.widget.CoordinatorLayout>

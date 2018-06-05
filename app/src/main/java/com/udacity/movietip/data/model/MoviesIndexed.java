@@ -48,9 +48,11 @@ public class MoviesIndexed {
         this.results = results;
     }
 
+
     public List<Movie> getResults() {
         return results;
     }
+
 
     public MoviesIndexed withResults(List<Movie> results){
         this.results = results;
@@ -82,5 +84,6 @@ public class MoviesIndexed {
         this.totalPages = totalPages;
         return this;
     }
+
 }
 

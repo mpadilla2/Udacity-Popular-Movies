@@ -6,13 +6,9 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,31 +21,24 @@ import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
-import com.udacity.movietip.ui.activities.MainActivity;
-import com.udacity.movietip.ui.utils.RecyclerViewItemMargins;
 
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MasterGridFragment extends Fragment{
-    private static final String TAG = "MasterGridFragment";
-    private static final String MOVIES_LIST = "movies_list";
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR_PATH = "popular";
 
     private Context mContext;
-    private RecyclerView mRecyclerView;
     private MasterGridAdapter mAdapter;
-    private ArrayList<Movie> mMovieList;
 
     /* Create a new instance of MasterGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment
-     * Begin Fragment newInstance()
      */
     public MasterGridFragment newInstance(String category){
         MasterGridFragment masterGridFragment = new MasterGridFragment();
@@ -63,7 +52,6 @@ public class MasterGridFragment extends Fragment{
 
         return masterGridFragment;
     }
-    /* End Fragment newInstance()*/
 
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -104,7 +92,7 @@ public class MasterGridFragment extends Fragment{
 
         // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_master_grid, container, false);
-        mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
+        RecyclerView mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
         // Instantiate and set the RecyclerView LayoutManager to a grid with 3 columns
@@ -113,19 +101,16 @@ public class MasterGridFragment extends Fragment{
 
         /* Instantiate custom MasterGridAdapter and custom click listener
            Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
-           Begin Adapter/Click Listener
          */
         final List<Movie> movieList = new ArrayList<>();
         mAdapter = new MasterGridAdapter(getActivity(), movieList, new GridItemClickListener() {
             @Override
-            public void onGridItemClick(View v, int clickedItemIndex) {
+            public void onGridItemClick(int clickedItemIndex) {
                 Movie movie = movieList.get(clickedItemIndex);
                 mCallback.onImageSelected(movie);
             }
         });
-        // End Adapter/Click Listener
 
-        // recyclerview spacing 11:34 to 14:50
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -148,16 +133,13 @@ public class MasterGridFragment extends Fragment{
         String language = "en_US";
         int pageNum = 1;
 
-        ApiService mService = ApiUtils.getApiService(mContext);
+        ApiService mService = ApiUtils.getApiService();
         mService.getJSON(category, language, pageNum).enqueue(new Callback<MoviesIndexed>() {
             @Override
             public void onResponse(@NonNull Call<MoviesIndexed> call, @NonNull Response<MoviesIndexed> response) {
-                if (response.body() != null) {
-                    List<Movie> movieList = response.body().getResults();
-                    mAdapter.setMoviesList(movieList);
-                }else{
-                    Toast.makeText(getActivity(), "Oops! No movies returned!", Toast.LENGTH_SHORT).show();
-                }
+                assert response.body() != null;
+                List<Movie> movieList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
+                mAdapter.setMoviesList(movieList);
             }
 
             @Override
@@ -168,13 +150,14 @@ public class MasterGridFragment extends Fragment{
     }
 
 
-    /* Begin Connectivity Monitoring
+    /*
        Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
      */
     private boolean isActiveNetwork(){
 
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager;
+        connectivityManager = (ConnectivityManager) Objects.requireNonNull(getContext())
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = null;
         if (connectivityManager != null) {
@@ -182,13 +165,6 @@ public class MasterGridFragment extends Fragment{
         }
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
-    /* End Connectivity Monitoring */
 
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(MOVIES_LIST, mMovieList);
-
-    }
 }

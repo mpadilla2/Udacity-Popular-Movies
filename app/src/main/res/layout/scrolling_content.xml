@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/scrolling_constraint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/detail_movie_release_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/detail_movie_date"
+            app:layout_constraintStart_toEndOf="@+id/detail_movie_release_date_label"
+            app:layout_constraintTop_toBottomOf="@+id/movie_detail_vote_average" />
+
+        <TextView
+            android:id="@+id/detail_movie_release_date_label"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/detail_movie_release_date"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/movie_detail_vote_average" />
+
+        <TextView
+            android:id="@+id/detail_movie_overview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/detail_movie_overview_text"
+            android:typeface="monospace"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_movie_release_date_label" />
+
+        <RatingBar
+            android:id="@+id/movie_detail_vote_average"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:isIndicator="true"
+            android:max="10"
+            android:numStars="10"
+            android:stepSize="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/detail_movie_vote_count_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/detail_movie_votes"
+            app:layout_constraintStart_toEndOf="@+id/movie_detail_vote_average"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/detail_movie_vote_count_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/detail_movie_vote_count"
+            app:layout_constraintStart_toEndOf="@+id/detail_movie_vote_count_label"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--<ImageView
+                android:layout_width="382dp"
+                android:layout_height="331dp"
+                android:layout_marginTop="180dp"
+                android:src="@drawable/ic_star_black_24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/detail_movie_backdrop_imageView" />-->
+
+    </android.support.constraint.ConstraintLayout>
+
+</merge>

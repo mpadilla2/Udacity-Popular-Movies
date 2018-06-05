@@ -3,7 +3,6 @@ package com.udacity.movietip.data.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +18,14 @@ import java.util.List;
 // Reference: https://developer.android.com/guide/topics/ui/layout/recyclerview
 public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.MovieViewHolder>{
 
-    private static final String TAG = "MasterGridAdapter";
-
     final private GridItemClickListener mOnClickListener;
 
-    private List<Movie> mMoviesList;
+    private final List<Movie> mMoviesList;
     private final Context mContext;
 
     // Reference: Udacity Android Developer Nanodegree Program > Developing Android Apps > Lesson 4: RecyclerView > Part 20. Responding to Clicks
     public interface GridItemClickListener {
-        void onGridItemClick(View v, int clickedItemIndex);
+        void onGridItemClick(int clickedItemIndex);
     }
 
     // Provide a reference to the views for each image item
@@ -43,7 +40,7 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
 
         @Override
         public void onClick(View v) {
-            mOnClickListener.onGridItemClick(v, getAdapterPosition());
+            mOnClickListener.onGridItemClick(getAdapterPosition());
         }
     }
 
@@ -75,7 +72,7 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
         String posterUrl = mMoviesList.get(position).getPosterUrl();
 
         Glide.with(mContext)
-                .load(mMoviesList.get(position).getPosterUrl())
+                .load(posterUrl)
                 .apply(new RequestOptions()
                         .placeholder(R.drawable.ic_image_loading)
                         .error(R.drawable.ic_broken_image))
