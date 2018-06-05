@@ -19,13 +19,8 @@ import com.udacity.movietip.ui.fragments.MasterGridFragment;
 public class MainActivity extends AppCompatActivity implements MasterGridFragment.OnImageClickListener{
 
     /*
-    https://www.simplifiedcoding.net/bottom-navigation-android-example
-    https://materialdoc.com/components/bottom-navigation/
-
-    TODO Handle null pointer exceptions
-    TODO What is strings.xml supposed to hold? strings.xml translatable
-    TODO Debugging and linting
-
+      Reference: https://www.simplifiedcoding.net/bottom-navigation-android-example
+      Reference: https://materialdoc.com/components/bottom-navigation/
      */
 
     private static final String MOVIE_ITEM = "Movie Item";
