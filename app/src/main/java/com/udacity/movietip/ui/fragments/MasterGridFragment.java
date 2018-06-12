@@ -77,12 +77,19 @@ public class MasterGridFragment extends Fragment{
         // Grab the category argument used to create new fragment or else default to popular movies category
         String mCategory = getArguments() != null ? getArguments().getString("category") : MOVIES_POPULAR_PATH;
 
-        // If the network is available, make the tmdb api call with the appropriate category for the fragment
-        if (isActiveNetwork()){
-            loadMovies(mCategory);
+        // check if the category is not favorites; we don't need a network call for favorites
+        if (mCategory != null && !mCategory.equals("favorites")) {
+            // If the network is available, make the tmdb api call with the appropriate category for the fragment
+            if (isActiveNetwork()) {
+                loadMovies(mCategory);
+            } else {
+                Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
+            }
         } else {
-            Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
+            // check and load the favorites data here.
+            Toast.makeText(getActivity(), "You chose the Favorites tab!", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 
@@ -110,7 +117,6 @@ public class MasterGridFragment extends Fragment{
                 mCallback.onImageSelected(movie);
             }
         });
-
 
         mRecyclerView.setAdapter(mAdapter);
 

@@ -5,8 +5,7 @@
     <string name="title_popular">Popular</string>
     <string name="title_top_rated">Top Rated</string>
     <string name="title_now_playing">Now Playing</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_favorites">Favorites</string>
 
     <string name="internet_status">"No internet connection!"</string>
     <string name="detail_movie_date">10/15/2018</string>

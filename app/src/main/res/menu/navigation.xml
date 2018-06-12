@@ -15,8 +15,8 @@
         android:title="@string/title_now_playing"
         android:icon="@drawable/ic_movie_filter_black_24dp" />
 
-    <!--<item
+    <item
         android:id="@+id/navigation_favorites"
         android:title="@string/title_favorites"
-        android:icon="@drawable/ic_favorite_black_24dp"/>-->
+        android:icon="@drawable/ic_favorite_black_24dp"/>
 </menu>
