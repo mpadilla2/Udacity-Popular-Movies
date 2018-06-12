@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -20,12 +21,27 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.Movie;
+import com.udacity.movietip.data.model.MoviesIndexed;
+import com.udacity.movietip.data.model.Reviews;
+import com.udacity.movietip.data.model.ReviewsIndexed;
+import com.udacity.movietip.data.model.Trailers;
+import com.udacity.movietip.data.model.TrailersIndexed;
+import com.udacity.movietip.data.remote.ApiService;
+import com.udacity.movietip.data.utils.ApiUtils;
+
+import java.util.List;
+import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
 
     private static final String MOVIE_ITEM = "Movie Item";
     private static final int IMAGE_LOADING = R.drawable.ic_image_loading;
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
+    Context mContext = this;
 
     /*
       Parcelable concepts applied from: https://www.youtube.com/watch?v=WBbsvqSu0is
@@ -38,6 +54,8 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Movie movie = intent.getParcelableExtra(MOVIE_ITEM);
 
+        Integer movieId = movie.getId();
+        Boolean hasVideo = movie.getVideo();
         String backdropUrl = movie.getBackdropUrl();
         String posterUrl = movie.getPosterUrl();
         String title = movie.getTitle();
@@ -45,6 +63,9 @@ public class DetailActivity extends AppCompatActivity {
         Integer voteCount = movie.getVoteCount();
         String releaseDate = movie.getReleaseDate();
         String overview = movie.getOverview();
+
+        loadTrailers(movieId);
+        loadReviews(movieId);
 
         // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -118,4 +139,44 @@ public class DetailActivity extends AppCompatActivity {
                         .error(BROKEN_IMAGE))
                 .into(imageView);
     }
+
+    private void loadTrailers(Integer movieId){
+
+        ApiService mService = ApiUtils.getApiService();
+        mService.getTrailers(movieId).enqueue(new Callback<TrailersIndexed>() {
+            @Override
+            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
+                assert response.body() != null;
+                List<Trailers> trailersList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
+                Toast.makeText(getBaseContext(), "Retrieval of TRAILERS successful!", Toast.LENGTH_SHORT).show();
+                //mAdapter.setMoviesList(movieList);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
+                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void loadReviews(Integer movieId){
+
+        ApiService mService = ApiUtils.getApiService();
+        mService.getReviews(movieId).enqueue(new Callback<ReviewsIndexed>() {
+            @Override
+            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
+                assert response.body() != null;
+                List<Reviews> reviewsList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
+                Toast.makeText(getBaseContext(), "Retrieval of REVIEWS successful!", Toast.LENGTH_SHORT).show();
+                //mAdapter.setMoviesList(movieList);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
+                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

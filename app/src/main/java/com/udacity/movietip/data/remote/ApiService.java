@@ -1,6 +1,8 @@
 package com.udacity.movietip.data.remote;
 
 import com.udacity.movietip.data.model.MoviesIndexed;
+import com.udacity.movietip.data.model.ReviewsIndexed;
+import com.udacity.movietip.data.model.TrailersIndexed;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -17,4 +19,10 @@ public interface ApiService {
     Call<MoviesIndexed> getJSON(@Path("apiPath") String apiPath,
                                 @Query("language") String language,
                                 @Query("page") int pageNum);
+
+    @GET("movie/{movie_id}/videos")
+    Call<TrailersIndexed> getTrailers(@Query("movieId") Integer movieId);
+
+    @GET("movie/{movie_id}/reviews")
+    Call<ReviewsIndexed> getReviews(@Query("movieId") Integer movieId);
 }

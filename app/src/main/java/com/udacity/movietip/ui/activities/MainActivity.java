@@ -30,6 +30,11 @@ public class MainActivity extends AppCompatActivity implements MasterGridFragmen
             https://developer.android.com/topic/performance/graphics/cache-bitmap#config-changes
             https://developer.android.com/topic/libraries/architecture/saving-states
 
+        DONE Create Trailers models
+        DONE Create Reviews models
+        DONE modify apiservice to add reviews and trailers calls
+        DONE add method to DetailActivity to call for trailers
+        TODO add method to DetailActivity to call for reviews
         TODO Display trailers in detail activity
             if video then make api call and pass the movie id
         TODO Launch trailers with intent to youtube or other player
