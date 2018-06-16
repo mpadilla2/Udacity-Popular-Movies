@@ -3,6 +3,12 @@ package com.udacity.movietip.data.model;
 // @Generated("com.robohorse.robopojogenerator")
 public class Trailers {
 
+	private static final String TRAILER_BASE_URL = "https://www.youtube.com/watch?v=";
+
+	//https://coderwall.com/p/nihgwq/get-a-thumbnail-from-a-youtube-video
+	private static final String TRAILER_THUMBNAIL_BASE_URL = "https://img.youtube.com/vi/";
+	private static final String TRAILER_THUMBNAIL_END_PATH = "/default.jpg";
+
 	private String site;
 	private int size;
 	private String iso31661;
@@ -11,6 +17,24 @@ public class Trailers {
 	private String type;
 	private String iso6391;
 	private String key;
+
+	/*
+	  sample output from tmdb api call for videos
+
+	  Of note
+	  key is the id for retrieving from youtube
+	  Name is the name of the trailer
+	  Type can show Trailer, Clip, Teaser, Featurette
+
+	  "id": "5a200baa925141033608f5f0",
+      "iso_639_1": "en",
+      "iso_3166_1": "US",
+      "key": "6ZfuNTqbHE8",
+      "name": "Official Trailer",
+      "site": "YouTube",
+      "size": 1080,
+      "type": "Trailer"
+	 */
 
 
 	public void setSite(String site){
@@ -75,6 +99,14 @@ public class Trailers {
 
 	public String getKey(){
 		return key;
+	}
+
+	public String getTrailerUrl(){
+		return TRAILER_BASE_URL + key;
+	}
+
+	public String getTrailerThumbnailUrl(){
+		return TRAILER_THUMBNAIL_BASE_URL + key + TRAILER_THUMBNAIL_END_PATH;
 	}
 
 	@Override

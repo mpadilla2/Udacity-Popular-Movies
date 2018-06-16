@@ -21,8 +21,8 @@ public interface ApiService {
                                 @Query("page") int pageNum);
 
     @GET("movie/{movie_id}/videos")
-    Call<TrailersIndexed> getTrailers(@Query("movieId") Integer movieId);
+    Call<TrailersIndexed> getTrailers(@Path("movie_id") Integer movieId);
 
     @GET("movie/{movie_id}/reviews")
-    Call<ReviewsIndexed> getReviews(@Query("movieId") Integer movieId);
+    Call<ReviewsIndexed> getReviews(@Path("movie_id") Integer movieId);
 }

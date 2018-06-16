@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements MasterGridFragmen
         DONE Create Reviews models
         DONE modify apiservice to add reviews and trailers calls
         DONE add method to DetailActivity to call for trailers
-        TODO add method to DetailActivity to call for reviews
+        DONE add method to DetailActivity to call for reviews
         TODO Display trailers in detail activity
             if video then make api call and pass the movie id
         TODO Launch trailers with intent to youtube or other player

@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -20,6 +23,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.udacity.movietip.R;
+import com.udacity.movietip.data.adapters.TrailersAdapter;
+import com.udacity.movietip.data.adapters.TrailersAdapter.ItemClickListener;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.model.Reviews;
@@ -29,6 +34,7 @@ import com.udacity.movietip.data.model.TrailersIndexed;
 import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,6 +48,7 @@ public class DetailActivity extends AppCompatActivity {
     private static final int IMAGE_LOADING = R.drawable.ic_image_loading;
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
     Context mContext = this;
+    private TrailersAdapter mTrailersAdapter;
 
     /*
       Parcelable concepts applied from: https://www.youtube.com/watch?v=WBbsvqSu0is
@@ -65,7 +72,7 @@ public class DetailActivity extends AppCompatActivity {
         String overview = movie.getOverview();
 
         loadTrailers(movieId);
-        loadReviews(movieId);
+        //loadReviews(movieId);
 
         // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -106,6 +113,36 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        RecyclerView mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
+        mTrailersRecyclerView.setHasFixedSize(true);
+
+        // todo output is scrolling vertically inside the scrolling content (double scrolling); don't want that
+        // todo thumbnail images are TINY!!
+        // Instantiate and set the RecyclerView LayoutManager to a horizontal linearlayout
+        RecyclerView.LayoutManager mTrailersLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
+        mTrailersRecyclerView.setLayoutManager(mTrailersLayoutManager);
+
+        final List<Trailers> trailersList = new ArrayList<>();
+        mTrailersAdapter = new TrailersAdapter(this, trailersList, new ItemClickListener() {
+            @Override
+            public void onItemClick(int clickedItemIndex) {
+                // grab the clicked trailer
+                Trailers trailer = trailersList.get(clickedItemIndex);
+
+                // Reference: https://developer.android.com/guide/components/intents-common#Music
+                Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
+                trailerIntent.setData(Uri.parse(trailer.getTrailerUrl()));
+
+                // Reference: https://developer.android.com/training/basics/intents/sending#AppChooser
+                Intent chooser = Intent.createChooser(trailerIntent, "Choose Player");
+
+                if (trailerIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(chooser);
+                }
+            }
+        });
+
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
     }
 
     private void setConstraintBackground(String imageUrl) {
@@ -149,7 +186,7 @@ public class DetailActivity extends AppCompatActivity {
                 assert response.body() != null;
                 List<Trailers> trailersList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
                 Toast.makeText(getBaseContext(), "Retrieval of TRAILERS successful!", Toast.LENGTH_SHORT).show();
-                //mAdapter.setMoviesList(movieList);
+                mTrailersAdapter.setTrailersList(trailersList);
             }
 
             @Override

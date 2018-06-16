@@ -8,6 +8,8 @@
         android:layout_width="match_parent"
         android:layout_height="700dp">
 
+        <!-- todo need to implement layout similar to portrait. right now when I rotate app crashes because I don't have recyclerview. -->
+
         <ImageView
             android:id="@+id/detail_movie_poster_imageView"
             android:layout_width="120dp"
