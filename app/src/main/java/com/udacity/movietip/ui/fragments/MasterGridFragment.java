@@ -21,6 +21,7 @@ import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.ui.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,6 +106,8 @@ public class MasterGridFragment extends Fragment{
         // Instantiate and set the RecyclerView LayoutManager to a grid with 3 columns
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.GRID));
 
         /* Instantiate custom MasterGridAdapter and custom click listener
            Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f

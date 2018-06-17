@@ -2,10 +2,14 @@ package com.udacity.movietip.data.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,13 +37,18 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final ImageView trailerImageView;
         private final TextView trailerTextView;
+        private final ImageButton shareImageButton;
 
         TrailerViewHolder(View view){
             super(view);
 
             trailerImageView = view.findViewById(R.id.movie_trailer_imageView);
             trailerImageView.setOnClickListener(this);
+
             trailerTextView = view.findViewById(R.id.movie_trailer_title);
+
+            shareImageButton = view.findViewById(R.id.movie_trailer_share_button);
+            shareImageButton.setOnClickListener(this);
         }
 
         @Override
@@ -60,6 +69,15 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     @Override
     public TrailersAdapter.TrailerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_trailer_item, parent, false);
+
+        // dynamically calculate and set the width of the view
+        // Reference: https://stackoverflow.com/a/50498245
+        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        Integer width = displayMetrics.widthPixels;
+        int calculatedWidth = (int) Math.round(width/1.5);
+
+        view.setLayoutParams(new RecyclerView.LayoutParams(calculatedWidth, RecyclerView.LayoutParams.WRAP_CONTENT));
+
         return new TrailerViewHolder(view);
     }
 
@@ -71,8 +89,6 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         String trailerName = "";
 
         trailerName = mTrailersList.get(position).getName();
-        // set text to trailer name below the trailer
-        // Todo right now it's ABOVE the trailer. I want it below the trailer
         holder.trailerTextView.setText(trailerName);
 
         /* Use Glide to load the trailers from the internet

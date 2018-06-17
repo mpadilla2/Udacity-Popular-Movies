@@ -23,6 +23,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.udacity.movietip.R;
+import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter.ItemClickListener;
 import com.udacity.movietip.data.model.Movie;
@@ -33,6 +34,7 @@ import com.udacity.movietip.data.model.Trailers;
 import com.udacity.movietip.data.model.TrailersIndexed;
 import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.ui.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +51,7 @@ public class DetailActivity extends AppCompatActivity {
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
     Context mContext = this;
     private TrailersAdapter mTrailersAdapter;
+    private ReviewsAdapter mReviewsAdapter;
 
     /*
       Parcelable concepts applied from: https://www.youtube.com/watch?v=WBbsvqSu0is
@@ -72,7 +75,7 @@ public class DetailActivity extends AppCompatActivity {
         String overview = movie.getOverview();
 
         loadTrailers(movieId);
-        //loadReviews(movieId);
+        loadReviews(movieId);
 
         // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -115,12 +118,15 @@ public class DetailActivity extends AppCompatActivity {
 
         RecyclerView mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
         mTrailersRecyclerView.setHasFixedSize(true);
-
-        // todo output is scrolling vertically inside the scrolling content (double scrolling); don't want that
-        // todo thumbnail images are TINY!!
-        // Instantiate and set the RecyclerView LayoutManager to a horizontal linearlayout
         RecyclerView.LayoutManager mTrailersLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         mTrailersRecyclerView.setLayoutManager(mTrailersLayoutManager);
+        mTrailersRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
+
+        RecyclerView mReviewsRecyclerView = findViewById(R.id.detail_movie_reviews_recyclerview);
+        mReviewsRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager mReviewsLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
+        mReviewsRecyclerView.setLayoutManager(mReviewsLayoutManager);
+        mReviewsRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
 
         final List<Trailers> trailersList = new ArrayList<>();
         mTrailersAdapter = new TrailersAdapter(this, trailersList, new ItemClickListener() {
@@ -142,8 +148,28 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        final List<Reviews> reviewsList = new ArrayList<>();
+        mReviewsAdapter = new ReviewsAdapter(this, reviewsList, new ReviewsAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(int clickedItemIndex) {
+                // grab the clicked review
+                Reviews review = reviewsList.get(clickedItemIndex);
+
+                Intent reviewIntent = new Intent(Intent.ACTION_VIEW);
+                reviewIntent.setData(Uri.parse(review.getUrl()));
+
+                Intent chooser = Intent.createChooser(reviewIntent, "Choose Browser");
+
+                if (reviewIntent.resolveActivity(getPackageManager()) != null){
+                    startActivity(chooser);
+                }
+            }
+        });
+
         mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
     }
+
 
     private void setConstraintBackground(String imageUrl) {
 
@@ -206,7 +232,7 @@ public class DetailActivity extends AppCompatActivity {
                 assert response.body() != null;
                 List<Reviews> reviewsList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
                 Toast.makeText(getBaseContext(), "Retrieval of REVIEWS successful!", Toast.LENGTH_SHORT).show();
-                //mAdapter.setMoviesList(movieList);
+                mReviewsAdapter.setReviewsList(reviewsList);
             }
 
             @Override

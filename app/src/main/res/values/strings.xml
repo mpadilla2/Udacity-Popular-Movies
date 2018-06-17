@@ -15,5 +15,6 @@
     <string name="detail_movie_vote_count">12345</string>
     <string name="detail_movie_backdrop_image">movie backdrop image</string>
     <string name="detail_movie_poster">movie poster</string>
+    <string name="detail_movie_review">Movie Review</string>
 
 </resources>
