@@ -1,22 +1,26 @@
 package com.udacity.movietip.ui.activities;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -26,32 +30,55 @@ import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter.ItemClickListener;
+
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.MoviesIndexed;
+import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.Reviews;
-import com.udacity.movietip.data.model.ReviewsIndexed;
+import com.udacity.movietip.data.model.ReviewsViewModel;
 import com.udacity.movietip.data.model.Trailers;
-import com.udacity.movietip.data.model.TrailersIndexed;
-import com.udacity.movietip.data.remote.ApiService;
-import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.data.model.TrailersViewModel;
 import com.udacity.movietip.ui.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+public class DetailActivity
+        extends AppCompatActivity{
 
-public class DetailActivity extends AppCompatActivity {
-
-    private static final String MOVIE_ITEM = "Movie Item";
+    private static final String EXTRA_MOVIE_ITEM = "Movie Item";
+    private static final String SAVED_INSTANCE_MOVIE_ITEM = "Saved Movie";
+    private static final String SAVED_INSTANCE_REVIEWS_ITEM = "Saved Reviews";
+    private static final String SAVED_INSTANCE_TRAILERS_ITEM = "Saved Trailers";
     private static final int IMAGE_LOADING = R.drawable.ic_image_loading;
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
-    Context mContext = this;
+
+    private Context mContext;
     private TrailersAdapter mTrailersAdapter;
     private ReviewsAdapter mReviewsAdapter;
+
+    private ImageView mPosterImageView;
+    private ImageView mBackdropImageView;
+    private CollapsingToolbarLayout mCollapsingToolbar;
+    private TextView mReleaseDateTextView;
+    private TextView mOverViewTextView;
+    private RatingBar mRatingBar;
+    private TextView mVoteCountTextview;
+    private android.support.v7.widget.Toolbar mToolbar;
+    private ImageButton mFavoritesButton;
+    private RecyclerView mTrailersRecyclerView;
+    private RecyclerView mReviewsRecyclerView;
+
+    private Movie movie;
+    private ArrayList<Trailers> trailersList;
+    private ArrayList<Reviews> reviewsList;
+    private MovieViewModel mMovieViewModel;
+    private TrailersViewModel mTrailersViewModel;
+    private ReviewsViewModel mReviewsViewModel;
+
+
+    public DetailActivity() {
+        mContext = this;
+    }
 
     /*
       Parcelable concepts applied from: https://www.youtube.com/watch?v=WBbsvqSu0is
@@ -59,74 +86,88 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_detail);
 
-        Intent intent = getIntent();
-        Movie movie = intent.getParcelableExtra(MOVIE_ITEM);
+        initViews();
+        initRecyclerViews();
 
-        Integer movieId = movie.getId();
-        Boolean hasVideo = movie.getVideo();
-        String backdropUrl = movie.getBackdropUrl();
-        String posterUrl = movie.getPosterUrl();
-        String title = movie.getTitle();
-        Float voteAverage = movie.getVoteAverage();
-        Integer voteCount = movie.getVoteCount();
-        String releaseDate = movie.getReleaseDate();
-        String overview = movie.getOverview();
+        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+        mTrailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        mReviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
 
-        loadTrailers(movieId);
-        loadReviews(movieId);
+        if (savedInstanceState != null){
+            if (savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_ITEM)) {
+                movie = savedInstanceState.getParcelable(SAVED_INSTANCE_MOVIE_ITEM);
+            }
+            if (savedInstanceState.containsKey(SAVED_INSTANCE_REVIEWS_ITEM)) {
+                reviewsList = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM);
+            }
+            if (savedInstanceState.containsKey(SAVED_INSTANCE_TRAILERS_ITEM)) {
+                trailersList = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM);
+            }
 
-        // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            // if it's portrait, set the constraint background to the poster
-            setConstraintBackground(posterUrl);
+            if (trailersList != null) {
+                mTrailersAdapter.setTrailersList(trailersList);
+            }
+            if (reviewsList != null){
+                mReviewsAdapter.setReviewsList(reviewsList);
+            }
+
+        } else {
+
+            trailersList = new ArrayList<>();
+            reviewsList = new ArrayList<>();
+
+            Intent intent = getIntent();
+
+            if (intent != null && intent.hasExtra(EXTRA_MOVIE_ITEM)){
+                movie = intent.getParcelableExtra(EXTRA_MOVIE_ITEM);
+            }
+
+            loadTrailers(movie.getId());
+            loadReviews(movie.getId());
         }
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // if it's landscape, set the constraint background to the backdrop
-            setConstraintBackground(backdropUrl);
+        populateUI(movie);
 
-            ImageView posterImageView = findViewById(R.id.detail_movie_poster_imageView);
-            loadImages(this, posterUrl, posterImageView);
-        }
+        mFavoritesButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mMovieViewModel.toggleFavorite(movie);
+            }
+        });
 
-        ImageView backdropImageView = findViewById(R.id.detail_movie_backdrop_imageView);
-        loadImages(this, backdropUrl, backdropImageView);
-
-        // Set the toolbar title to the movie title
-        CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle(title);
-
-        TextView releaseDateTextView = findViewById(R.id.detail_movie_release_date);
-        releaseDateTextView.setText(releaseDate);
-
-        TextView overViewTextView = findViewById(R.id.detail_movie_overview);
-        overViewTextView.setText(overview);
-
-        RatingBar ratingBar = findViewById(R.id.movie_detail_vote_average);
-        ratingBar.setRating(voteAverage);
-
-        TextView voteCountTextview = findViewById(R.id.detail_movie_vote_count_textView);
-        voteCountTextview.setText(String.valueOf(voteCount));
-
-        android.support.v7.widget.Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        RecyclerView mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
-        mTrailersRecyclerView.setHasFixedSize(true);
+
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(SAVED_INSTANCE_MOVIE_ITEM, movie);
+        outState.putParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM, reviewsList);
+        outState.putParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM, trailersList);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void initRecyclerViews() {
+
         RecyclerView.LayoutManager mTrailersLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         mTrailersRecyclerView.setLayoutManager(mTrailersLayoutManager);
         mTrailersRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
+        mTrailersRecyclerView.setHasFixedSize(true);
 
-        RecyclerView mReviewsRecyclerView = findViewById(R.id.detail_movie_reviews_recyclerview);
-        mReviewsRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mReviewsLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         mReviewsRecyclerView.setLayoutManager(mReviewsLayoutManager);
         mReviewsRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
+        mReviewsRecyclerView.setHasFixedSize(true);
 
         final List<Trailers> trailersList = new ArrayList<>();
         mTrailersAdapter = new TrailersAdapter(this, trailersList, new ItemClickListener() {
@@ -165,9 +206,49 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
-        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+
+    private void initViews() {
+
+        mPosterImageView = findViewById(R.id.detail_movie_poster_imageView);
+        mBackdropImageView = findViewById(R.id.detail_movie_backdrop_imageView);
+        mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
+        mReleaseDateTextView = findViewById(R.id.detail_movie_release_date);
+        mOverViewTextView = findViewById(R.id.detail_movie_overview);
+        mRatingBar = findViewById(R.id.movie_detail_vote_average);
+        mVoteCountTextview = findViewById(R.id.detail_movie_vote_count_textView);
+        mToolbar = findViewById(R.id.toolbar);
+        mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
+        mReviewsRecyclerView = findViewById(R.id.detail_movie_reviews_recyclerview);
+        mFavoritesButton = findViewById(R.id.detail_movie_favorites_button);
+
+    }
+
+
+    private void populateUI(Movie movie){
+
+        if (movie == null) {
+            return;
+        }
+
+        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+
+        mCollapsingToolbar.setTitle(movie.getTitle());
+        mReleaseDateTextView.setText(movie.getReleaseDate());
+        mOverViewTextView.setText(movie.getOverview());
+        mRatingBar.setRating(movie.getVoteAverage());
+        mVoteCountTextview.setText(String.valueOf(movie.getVoteCount()));
+
+        // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
+        if(isPortrait) {
+            setConstraintBackground(movie.getPosterUrl());
+        } else {
+            setConstraintBackground(movie.getBackdropUrl());
+            loadImageIntoView(this, movie.getPosterUrl(), mPosterImageView);
+        }
+
+        loadImageIntoView(this, movie.getBackdropUrl(), mBackdropImageView);
     }
 
 
@@ -192,7 +273,8 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
-    private void loadImages(Context context, String imageUrl, ImageView imageView){
+
+    private void loadImageIntoView(Context context, String imageUrl, ImageView imageView){
 
         Glide.with(context)
                 .load(imageUrl)
@@ -203,43 +285,26 @@ public class DetailActivity extends AppCompatActivity {
                 .into(imageView);
     }
 
+
     private void loadTrailers(Integer movieId){
-
-        ApiService mService = ApiUtils.getApiService();
-        mService.getTrailers(movieId).enqueue(new Callback<TrailersIndexed>() {
+        mTrailersViewModel.getAllTrailers(movieId).observe(this, new Observer<List<Trailers>>() {
             @Override
-            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
-                assert response.body() != null;
-                List<Trailers> trailersList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
-                Toast.makeText(getBaseContext(), "Retrieval of TRAILERS successful!", Toast.LENGTH_SHORT).show();
+            public void onChanged(@Nullable List<Trailers> trailersList) {
+                Log.d("DetailActivity", "Updating list of Trailers from TMDB api LiveData in ViewModel");
                 mTrailersAdapter.setTrailersList(trailersList);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
-                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
     private void loadReviews(Integer movieId){
-
-        ApiService mService = ApiUtils.getApiService();
-        mService.getReviews(movieId).enqueue(new Callback<ReviewsIndexed>() {
+        mReviewsViewModel.getAllReviews(movieId).observe(this, new Observer<List<Reviews>>() {
             @Override
-            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
-                assert response.body() != null;
-                List<Reviews> reviewsList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
-                Toast.makeText(getBaseContext(), "Retrieval of REVIEWS successful!", Toast.LENGTH_SHORT).show();
-                mReviewsAdapter.setReviewsList(reviewsList);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
-                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
+            public void onChanged(@Nullable List<Reviews> reviews) {
+                Log.d("DetailActivity", "Updating list of Reviews from TMDB api LiveData in ViewModel");
+                mReviewsAdapter.setReviewsList(reviews);
             }
         });
-    }
 
+    }
 }

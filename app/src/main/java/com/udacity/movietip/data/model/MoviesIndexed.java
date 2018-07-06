@@ -1,11 +1,12 @@
 package com.udacity.movietip.data.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesIndexed {
 
     /*
-    Both Popular and Top Rated Movies API queries have identical JSON Schemas;
+    Popular, Top Rated, and Now Playing Movies API queries have identical JSON Schemas;
     So use Generic Movies Object.
 
     Using GSON: https://github.com/codepath/android_guides/wiki/Leveraging-the-Gson-Library
@@ -15,7 +16,7 @@ public class MoviesIndexed {
      */
 
     private Integer page;
-    private List<Movie> results;
+    private ArrayList<Movie> results;
     private Integer totalResults;
     private Integer totalPages;
 
@@ -24,7 +25,7 @@ public class MoviesIndexed {
      */
     public MoviesIndexed(){}
 
-    public MoviesIndexed(Integer page, List<Movie> results, Integer totalResults, Integer totalPages){
+    public MoviesIndexed(Integer page, ArrayList<Movie> results, Integer totalResults, Integer totalPages){
         this.page = page;
         this.results = results;
         this.totalResults = totalResults;
@@ -44,17 +45,17 @@ public class MoviesIndexed {
         return this;
     }
 
-    public void setResults(List<Movie> results){
+    public void setResults(ArrayList<Movie> results){
         this.results = results;
     }
 
 
-    public List<Movie> getResults() {
+    public ArrayList<Movie> getResults() {
         return results;
     }
 
 
-    public MoviesIndexed withResults(List<Movie> results){
+    public MoviesIndexed withResults(ArrayList<Movie> results){
         this.results = results;
         return this;
     }

@@ -1,58 +1,52 @@
 package com.udacity.movietip.data.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity(tableName = "favorites")
 public class Movie implements Parcelable {
-
 
     // TMDB api image sizes Reference: https://www.themoviedb.org/talk/53c11d4ec3a3684cf4006400?language=en
     private static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
     private static final String POSTER_SIZE = "w185";
     private static final String BACKDROP_SIZE = "w300";
-
     /*
      Using GSON: https://github.com/codepath/android_guides/wiki/Leveraging-the-Gson-Library
      If the class fields match the JSON keys, GSON will map automatically.
     */
     private String posterPath;
-    private Boolean adult;
     private String overview;
     private String releaseDate;
-    private List<Integer> genreIds = new ArrayList<>();
+    @PrimaryKey
     private Integer id;
-    private String originalTitle;
-    private String originalLanguage;
     private String title;
     private String backdropPath;
     private Double popularity;
     private Integer voteCount;
-    private Boolean video;
     private Float voteAverage;
 
-
+    @Ignore
     public Movie(){}
 
-    public Movie(String posterPath, Boolean isAdult, String plotSynopsis, String releaseDate,
-                 List<Integer> genreIds, Integer id, String originalTitle, String originalLanguage, String title,
-                 String backdropPath, Double popularity, Integer voteCount, Boolean hasVideo, Float voteAverage){
+    public Movie(String posterPath, String overview, String releaseDate, Integer id, String title,
+                 String backdropPath, Double popularity, Integer voteCount, Float voteAverage){
         this.posterPath = posterPath;
-        this.adult = isAdult;
-        this.overview = plotSynopsis;
+        this.overview = overview;
         this.releaseDate = releaseDate;
-        this.genreIds = genreIds;
         this.id = id;
-        this.originalTitle = originalTitle;
-        this.originalLanguage = originalLanguage;
         this.title = title;
         this.backdropPath = backdropPath;
         this.popularity = popularity;
         this.voteCount = voteCount;
-        this.video = hasVideo;
         this.voteAverage = voteAverage;
     }
 
@@ -68,16 +62,8 @@ public class Movie implements Parcelable {
         return IMAGE_BASE_URL + POSTER_SIZE + posterPath;
     }
 
-    public void setAdult(Boolean isAdult){
-        this.adult = isAdult;
-    }
-
-    public Boolean getAdult() {
-        return adult;
-    }
-
-    public void setOverview(String plotSynopsis){
-        this.overview = plotSynopsis;
+    public void setOverview(String overview){
+        this.overview = overview;
     }
 
     public String getOverview() {
@@ -92,36 +78,12 @@ public class Movie implements Parcelable {
         return releaseDate;
     }
 
-    public void setGenreIds(List<Integer> genreIds){
-        this.genreIds = genreIds;
-    }
-
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
     public void setId(Integer id){
         this.id = id;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setOriginalTitle(String originalTitle){
-        this.originalTitle = originalTitle;
-    }
-
-    public String getOriginalTitle() {
-        return originalTitle;
-    }
-
-    public void setOriginalLanguage(String originalLanguage){
-        this.originalLanguage = originalLanguage;
-    }
-
-    public String getOriginalLanguage() {
-        return originalLanguage;
     }
 
     public void setTitle(String title){
@@ -160,14 +122,6 @@ public class Movie implements Parcelable {
         return voteCount;
     }
 
-    public void setVideo(Boolean hasVideo){
-        this.video = hasVideo;
-    }
-
-    public Boolean getVideo() {
-        return video;
-    }
-
     public void setVoteAverage(Float voteAverage){
         this.voteAverage = voteAverage;
     }
@@ -186,36 +140,25 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.posterPath);
-        dest.writeValue(this.adult);
         dest.writeString(this.overview);
         dest.writeString(this.releaseDate);
-        dest.writeList(this.genreIds);
         dest.writeValue(this.id);
-        dest.writeString(this.originalTitle);
-        dest.writeString(this.originalLanguage);
         dest.writeString(this.title);
         dest.writeString(this.backdropPath);
         dest.writeSerializable(this.popularity);
         dest.writeValue(this.voteCount);
-        dest.writeValue(this.video);
         dest.writeSerializable(this.voteAverage);
     }
 
     private Movie(Parcel in) {
         this.posterPath = in.readString();
-        this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.overview = in.readString();
         this.releaseDate = in.readString();
-        this.genreIds = new ArrayList<>();
-        in.readList(this.genreIds, Integer.class.getClassLoader());
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.originalTitle = in.readString();
-        this.originalLanguage = in.readString();
         this.title = in.readString();
         this.backdropPath = in.readString();
         this.popularity = (Double) in.readSerializable();
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.voteAverage = (Float) in.readSerializable();
         String posterUrl = in.readString();
         String backdropUrl = in.readString();

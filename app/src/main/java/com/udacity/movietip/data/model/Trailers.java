@@ -1,7 +1,9 @@
 package com.udacity.movietip.data.model;
 
-// @Generated("com.robohorse.robopojogenerator")
-public class Trailers {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Trailers implements Parcelable {
 
 	private static final String TRAILER_BASE_URL = "https://www.youtube.com/watch?v=";
 
@@ -123,4 +125,49 @@ public class Trailers {
 			",key = '" + key + '\'' + 
 			"}";
 		}
+
+	// Parcelable boilerplate code implemented with Android Parcelable Code Generator by Michal Charmas
+	// Reference: https://developer.android.com/guide/components/activities/parcelables-and-bundles
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.site);
+		dest.writeInt(this.size);
+		dest.writeString(this.iso31661);
+		dest.writeString(this.name);
+		dest.writeString(this.id);
+		dest.writeString(this.type);
+		dest.writeString(this.iso6391);
+		dest.writeString(this.key);
+	}
+
+	public Trailers() {
+	}
+
+	protected Trailers(Parcel in) {
+		this.site = in.readString();
+		this.size = in.readInt();
+		this.iso31661 = in.readString();
+		this.name = in.readString();
+		this.id = in.readString();
+		this.type = in.readString();
+		this.iso6391 = in.readString();
+		this.key = in.readString();
+	}
+
+	public static final Creator<Trailers> CREATOR = new Creator<Trailers>() {
+		@Override
+		public Trailers createFromParcel(Parcel source) {
+			return new Trailers(source);
+		}
+
+		@Override
+		public Trailers[] newArray(int size) {
+			return new Trailers[size];
+		}
+	};
 }

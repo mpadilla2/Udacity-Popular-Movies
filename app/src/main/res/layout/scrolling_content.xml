@@ -84,6 +84,13 @@
                 android:text="@string/detail_movie_vote_count"
                 app:layout_constraintStart_toEndOf="@+id/detail_movie_vote_count_label"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/detail_movie_favorites_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_favorite_black_24dp" />
+
         </android.support.constraint.ConstraintLayout>
 
     </android.support.v7.widget.CardView>
