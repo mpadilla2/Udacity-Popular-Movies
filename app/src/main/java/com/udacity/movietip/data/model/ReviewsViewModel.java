@@ -18,7 +18,7 @@ public class ReviewsViewModel extends AndroidViewModel{
         mRepository = new DataRepository(application);
     }
 
-    public LiveData<List<Reviews>> getAllReviews(Integer movieId){
+    public LiveData<List<Reviews>> getAllReviews(int movieId){
         mAllReviews = mRepository.getAllReviews(movieId);
         return mAllReviews;
     }

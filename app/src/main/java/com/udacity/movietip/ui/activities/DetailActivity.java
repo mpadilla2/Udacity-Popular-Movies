@@ -286,7 +286,7 @@ public class DetailActivity
     }
 
 
-    private void loadTrailers(Integer movieId){
+    private void loadTrailers(int movieId){
         mTrailersViewModel.getAllTrailers(movieId).observe(this, new Observer<List<Trailers>>() {
             @Override
             public void onChanged(@Nullable List<Trailers> trailersList) {
@@ -297,7 +297,7 @@ public class DetailActivity
     }
 
 
-    private void loadReviews(Integer movieId){
+    private void loadReviews(int movieId){
         mReviewsViewModel.getAllReviews(movieId).observe(this, new Observer<List<Reviews>>() {
             @Override
             public void onChanged(@Nullable List<Reviews> reviews) {

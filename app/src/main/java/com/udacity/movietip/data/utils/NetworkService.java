@@ -47,9 +47,7 @@ public class NetworkService extends JobService implements NetWorkReceiver.NetWor
         String message = isConnected ? "Yep, device has a network connection" : "Oops! No network connection!";
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
-
         LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
-
 
     }
 }

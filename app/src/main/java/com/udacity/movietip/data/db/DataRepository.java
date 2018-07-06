@@ -56,7 +56,7 @@ public class DataRepository {
 
 
     // Query is run on a background thread because we're returning LiveData.
-    public LiveData<Movie> getMovie(Integer movieId){
+    public LiveData<Movie> getMovie(int movieId){
         mMovie = favoriteMoviesDAO.getMovieById(movieId);
         return mMovie;
     }
@@ -105,7 +105,7 @@ public class DataRepository {
     }
 
 
-    public LiveData<List<Trailers>> getAllTrailers(Integer movieId) {
+    public LiveData<List<Trailers>> getAllTrailers(int movieId) {
 
         final MutableLiveData<List<Trailers>> data = new MutableLiveData<>();
 
@@ -128,7 +128,7 @@ public class DataRepository {
     }
 
 
-    public LiveData<List<Reviews>> getAllReviews(Integer movieId) {
+    public LiveData<List<Reviews>> getAllReviews(int movieId) {
 
         final MutableLiveData<List<Reviews>> data = new MutableLiveData<>();
 

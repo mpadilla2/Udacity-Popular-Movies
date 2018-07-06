@@ -5,12 +5,6 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity(tableName = "favorites")
 public class Movie implements Parcelable {
@@ -27,18 +21,18 @@ public class Movie implements Parcelable {
     private String overview;
     private String releaseDate;
     @PrimaryKey
-    private Integer id;
+    private int id;
     private String title;
     private String backdropPath;
-    private Double popularity;
-    private Integer voteCount;
-    private Float voteAverage;
+    private double popularity;
+    private int voteCount;
+    private float voteAverage;
 
     @Ignore
     public Movie(){}
 
-    public Movie(String posterPath, String overview, String releaseDate, Integer id, String title,
-                 String backdropPath, Double popularity, Integer voteCount, Float voteAverage){
+    public Movie(String posterPath, String overview, String releaseDate, int id, String title,
+                 String backdropPath, double popularity, int voteCount, float voteAverage){
         this.posterPath = posterPath;
         this.overview = overview;
         this.releaseDate = releaseDate;
@@ -78,11 +72,11 @@ public class Movie implements Parcelable {
         return releaseDate;
     }
 
-    public void setId(Integer id){
+    public void setId(int id){
         this.id = id;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -106,27 +100,27 @@ public class Movie implements Parcelable {
         return IMAGE_BASE_URL + BACKDROP_SIZE + backdropPath;
     }
 
-    public void setPopularity(Double popularity){
+    public void setPopularity(double popularity){
         this.popularity = popularity;
     }
 
-    public Double getPopularity() {
+    public double getPopularity() {
         return popularity;
     }
 
-    public void setVoteCount(Integer voteCount){
+    public void setVoteCount(int voteCount){
         this.voteCount = voteCount;
     }
 
-    public Integer getVoteCount() {
+    public int getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteAverage(Float voteAverage){
+    public void setVoteAverage(float voteAverage){
         this.voteAverage = voteAverage;
     }
 
-    public Float getVoteAverage() {
+    public float getVoteAverage() {
         return voteAverage;
     }
 
@@ -154,12 +148,12 @@ public class Movie implements Parcelable {
         this.posterPath = in.readString();
         this.overview = in.readString();
         this.releaseDate = in.readString();
-        this.id = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.id = (int) in.readValue(int.class.getClassLoader());
         this.title = in.readString();
         this.backdropPath = in.readString();
-        this.popularity = (Double) in.readSerializable();
-        this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.voteAverage = (Float) in.readSerializable();
+        this.popularity = (double) in.readSerializable();
+        this.voteCount = (int) in.readValue(int.class.getClassLoader());
+        this.voteAverage = (float) in.readSerializable();
         String posterUrl = in.readString();
         String backdropUrl = in.readString();
     }

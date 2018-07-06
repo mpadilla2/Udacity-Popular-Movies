@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 import com.udacity.movietip.data.model.Movie;
 
 // Singleton pattern with lazy instantiation
-@Database(entities = {Movie.class}, version = 1, exportSchema = false)
+@Database(entities = {Movie.class}, version = 2, exportSchema = false)
 public abstract class FavoriteMoviesDatabase extends RoomDatabase {
 
     private static final String DATABASE_NAME = "movies.db";

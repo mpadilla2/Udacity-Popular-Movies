@@ -12,7 +12,6 @@ import android.widget.Toast;
 // http://www.singhajit.com/notify-android-device-network-status-changes/
 
 // use jobscheduler to check for internet and only download from internet when there is a connection
-// can also work with changes to a content provider
 public class NetWorkReceiver extends BroadcastReceiver {
 
     private NetWorkReceiverListener mNetWorkReceiverListener;

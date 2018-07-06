@@ -18,7 +18,7 @@ public class TrailersViewModel extends AndroidViewModel{
         mRepository = new DataRepository(application);
     }
 
-    public LiveData<List<Trailers>> getAllTrailers(Integer movieId){
+    public LiveData<List<Trailers>> getAllTrailers(int movieId){
         mAllTrailers = mRepository.getAllTrailers(movieId);
         return mAllTrailers;
     }
