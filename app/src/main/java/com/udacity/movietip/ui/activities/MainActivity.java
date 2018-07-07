@@ -25,6 +25,17 @@ import com.udacity.movietip.ui.fragments.MasterGridFragment;
 public class MainActivity extends AppCompatActivity implements MasterGridFragment.OnImageClickListener{
 
     /*
+    Best one fits my scenario. But need to refactor fragment first and separate api type fragment from db type fragment.
+    api type: has a: pagedlist recyclerview and adapter, tmdb datasource
+    db type: has a: regular recyclerview and adapter, db datasource
+
+    http://androidkt.com/rest-api-pagination-paging-library/
+    https://proandroiddev.com/8-steps-to-implement-paging-library-in-android-d02500f7fffe
+    https://github.com/codepath/android_guides/wiki/Paging-Library-Guide
+    http://codinginfinite.com/android-paging-library-example/
+
+
+
         DONE implement livedata for configuration changes and saving state
         TODO Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview
         TODO Implement onsaveinstancestate for bottomnavigation
@@ -68,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements MasterGridFragmen
         TODO Adhere to material design for margins, etc.
         DONE Make trailers and reviews clickable
         todo document references
-        todo two bugs make app not adhere to rubric. see notes in notepadqq
+        todo two bugs make app not adhere to rubric. 1. on rotation needs to use livedata and not onsaveinstancestate 2. favorites tab does not refresh when I toggle a favorite from the favorites tab. see steps to recreate in notepadqq or git commit
 
      */
 

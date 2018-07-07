@@ -25,6 +25,16 @@ task clean(type: Delete) {
 }
 
 ext {
-    roomVersion = '1.1.1'
     archLifecycleVersion = '1.1.1'
+    constraintVersion = '1.1.0'
+    espressoVersion = '3.0.2'
+    glideVersion = '4.7.1'
+    gsonVersion = '2.8.4'
+    junitVersion = '4.12'
+    okhttp3Version = '3.10.0'
+    pagingVersion = '1.0.1'
+    retrofitVersion = '2.3.0'
+    roomVersion = '1.1.1'
+    runnerVersion = '1.0.2'
+    supportLibVersion = '27.1.1'
 }
