@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
@@ -23,18 +24,18 @@ import java.util.List;
 
 public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.TrailerViewHolder> {
 
-    final private ItemClickListener mOnClickListener;
-
+    private final ItemClickListener mOnClickListener;
     private final List<Trailers> mTrailersList;
     private final Context mContext;
 
-    // Reference: Udacity Android Developer Nanodegree Program > Developing Android Apps > Lesson 4: RecyclerView > Part 20. Responding to Clicks
+    // Reference: https://www.codeproject.com/Tips/1229751/Handle-Click-Events-of-Multiple-Buttons-Inside-a
     public interface ItemClickListener {
-        void onItemClick(int clickedItemIndex);
+        void trailerOnClick(View v, int clickedItemIndex);
+        void shareOnClick(View v, int clickedItemIndex);
     }
 
     // Provide a reference to the views for each trailer item
-    class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class TrailerViewHolder extends RecyclerView.ViewHolder {
         private final ImageView trailerImageView;
         private final TextView trailerTextView;
         private final ImageButton shareImageButton;
@@ -42,18 +43,23 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         TrailerViewHolder(View view){
             super(view);
 
-            trailerImageView = view.findViewById(R.id.movie_trailer_imageView);
-            trailerImageView.setOnClickListener(this);
-
             trailerTextView = view.findViewById(R.id.movie_trailer_title);
-
             shareImageButton = view.findViewById(R.id.movie_trailer_share_button);
-            shareImageButton.setOnClickListener(this);
-        }
+            trailerImageView = view.findViewById(R.id.movie_trailer_imageView);
 
-        @Override
-        public void onClick(View v) {
-            mOnClickListener.onItemClick(getAdapterPosition());
+            trailerImageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnClickListener.trailerOnClick(v, getAdapterPosition());
+                }
+            });
+
+            shareImageButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnClickListener.shareOnClick(v, getAdapterPosition());
+                }
+            });
         }
     }
 
@@ -72,11 +78,11 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
         // dynamically calculate and set the width of the view
         // Reference: https://stackoverflow.com/a/50498245
-        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+/*        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
         Integer width = displayMetrics.widthPixels;
-        int calculatedWidth = (int) Math.round(width/1.5);
+        int calculatedWidth = (int) Math.round(width/1.2);
 
-        view.setLayoutParams(new RecyclerView.LayoutParams(calculatedWidth, RecyclerView.LayoutParams.WRAP_CONTENT));
+        view.setLayoutParams(new RecyclerView.LayoutParams(calculatedWidth, RecyclerView.LayoutParams.WRAP_CONTENT));*/
 
         return new TrailerViewHolder(view);
     }

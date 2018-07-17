@@ -38,6 +38,8 @@ public class DataRepository {
     private FavoriteMoviesDAO favoriteMoviesDAO;
     private LiveData<List<Movie>> mAllMovies;
     private LiveData<Movie> mMovie;
+    private int movieCount;
+
     ApiService mService;
 
 
@@ -51,6 +53,7 @@ public class DataRepository {
     // Query is run on a background thread because we're returning LiveData.
     public LiveData<List<Movie>> getAllMovies(){
         mAllMovies = favoriteMoviesDAO.getAllMovies();
+        Log.d("DATAREPOSITORY", "LOADED MOVIES FOR FAVORITES FROM DATABASE");
         return mAllMovies;
     }
 
@@ -62,17 +65,37 @@ public class DataRepository {
     }
 
 
-    public void toggleFavorite(Movie movie) {
+    public void insert(Movie movie){
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                favoriteMoviesDAO.insertMovie(movie);
+            }
+        });
+    }
+
+
+    public void delete(Movie movie) {
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                favoriteMoviesDAO.deleteMovie(movie);
+            }
+        });
+    }
+
+
+    public void toggleFavorite(Movie movie){
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                Integer movieCount = favoriteMoviesDAO.getMovieCount(movie.getId());
+                movieCount = favoriteMoviesDAO.getMovieCount(movie.getId());
 
-                if (movieCount == 0 ){
-                    favoriteMoviesDAO.insertMovie(movie);
+                if (movieCount > 0){
+                    delete(movie);
                 } else {
-                    favoriteMoviesDAO.deleteMovie(movie);
+                    insert(movie);
                 }
             }
         });
@@ -91,14 +114,14 @@ public class DataRepository {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
                     data.setValue(Objects.requireNonNull(response.body()).getResults());
-                    Log.d("DataRepository", "loaded movies from internet api");
+                    Log.d("DATAREPOSITORY", "LOADED MOVIES FOR " + category + " FROM INTERNET API");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
                 // do something here
-                Log.d("DataRepository", "Loading from internet api failed");
+                Log.d("DATAREPOSITORY", "LOADING FROM INTERNET API FOR " + category + "FAILED");
             }
         });
         return data;

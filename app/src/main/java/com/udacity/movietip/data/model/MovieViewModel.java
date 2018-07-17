@@ -3,6 +3,7 @@ package com.udacity.movietip.data.model;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 
@@ -17,6 +18,7 @@ public class MovieViewModel extends AndroidViewModel{
     private DataRepository mRepository;
     private LiveData<List<Movie>> mAllMovies;
     private LiveData<Movie> mMovie;
+    private LiveData<Integer> mMovieCount;
 
     public MovieViewModel(Application application){
         super(application);
@@ -33,12 +35,16 @@ public class MovieViewModel extends AndroidViewModel{
         return mAllMovies;
     }
 
-    public LiveData<Movie> getMovie(Movie movie){
-        mMovie = mRepository.getMovie(movie.getId());
+    public LiveData<Movie> getMovie(int movieId){
+        mMovie = mRepository.getMovie(movieId);
         return mMovie;
     }
 
-    public void toggleFavorite(Movie movie){
-        mRepository.toggleFavorite(movie);
+    public void insert(Movie movie) {
+        mRepository.insert(movie);
+    }
+
+    public void delete(Movie movie) {
+        mRepository.delete(movie);
     }
 }

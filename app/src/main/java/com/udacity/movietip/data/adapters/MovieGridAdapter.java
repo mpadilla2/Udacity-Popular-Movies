@@ -16,7 +16,7 @@ import com.udacity.movietip.data.model.Movie;
 import java.util.List;
 
 // Reference: https://developer.android.com/guide/topics/ui/layout/recyclerview
-public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.MovieViewHolder>{
+public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.MovieViewHolder>{
 
     final private GridItemClickListener mOnClickListener;
 
@@ -31,11 +31,13 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
     // Provide a reference to the views for each image item
     class MovieViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private final ImageView posterImage;
+
         MovieViewHolder(View view){
             super(view);
 
             posterImage = view.findViewById(R.id.movie_poster_imageView);
             posterImage.setOnClickListener(this);
+
         }
 
         @Override
@@ -45,7 +47,7 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
     }
 
     // Provide a constructor
-    public MasterGridAdapter(Context context, List<Movie> moviesList, GridItemClickListener listener){
+    public MovieGridAdapter(Context context, List<Movie> moviesList, GridItemClickListener listener){
         this.mContext = context;
         this.mOnClickListener = listener;
         this.mMoviesList = moviesList;
@@ -54,14 +56,15 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
     // Create new views as invoked by the layout manager
     @NonNull
     @Override
-    public MasterGridAdapter.MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_item, parent, false);
+    public MovieGridAdapter.MovieViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.layout_grid_item, parent, false);
         return new MovieViewHolder(view);
     }
 
     // Replace the contents of a view as invoked by the layout manager
     @Override
-    public void onBindViewHolder(@NonNull MasterGridAdapter.MovieViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MovieGridAdapter.MovieViewHolder holder, int position) {
 
         /* Use Glide to load the images from the internet
            Reference: https://github.com/bumptech/glide
@@ -69,10 +72,10 @@ public class MasterGridAdapter extends RecyclerView.Adapter<MasterGridAdapter.Mo
            Reference: ic_image_loading icon made by https://www.flaticon.com/authors/dave-gandy and is licensed by http://creativecommons.org/licenses/by/3.0/
          */
 
-        String posterUrl = mMoviesList.get(position).getPosterUrl();
+        final Movie movieItem = mMoviesList.get(position);
 
         Glide.with(mContext)
-                .load(posterUrl)
+                .load(movieItem.getPosterUrl())
                 .apply(new RequestOptions()
                         .placeholder(R.drawable.ic_image_loading)
                         .error(R.drawable.ic_broken_image))

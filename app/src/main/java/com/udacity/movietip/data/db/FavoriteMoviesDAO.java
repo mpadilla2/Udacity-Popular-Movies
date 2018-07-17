@@ -1,6 +1,7 @@
 package com.udacity.movietip.data.db;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -32,12 +33,12 @@ public interface FavoriteMoviesDAO {
     void deleteMovie(Movie movie);
 
     @Query("SELECT * FROM favorites WHERE id = :movieId")
-    LiveData<Movie> getMovieById(Integer movieId);
+    LiveData<Movie> getMovieById(int movieId);
 
     @Query("SELECT * from favorites ORDER BY title ASC")
     LiveData<List<Movie>> getAllMovies();
 
     @Query("SELECT count(*) from favorites WHERE id = :movieId")
-    Integer getMovieCount(Integer movieId);
+    int getMovieCount(int movieId);
 
 }

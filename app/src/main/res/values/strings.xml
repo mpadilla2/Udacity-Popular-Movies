@@ -16,5 +16,6 @@
     <string name="detail_movie_backdrop_image">movie backdrop image</string>
     <string name="detail_movie_poster">movie poster</string>
     <string name="detail_movie_review">Movie Review</string>
+    <string name="movie_trailer_imageView">Movie Trailer</string>
 
 </resources>

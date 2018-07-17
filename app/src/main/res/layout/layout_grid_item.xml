@@ -10,8 +10,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="5dp"
         app:cardElevation="5dp"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="5dp">
+        android:layout_centerHorizontal="true">
 
             <ImageView
                 xmlns:android="http://schemas.android.com/apk/res/android"

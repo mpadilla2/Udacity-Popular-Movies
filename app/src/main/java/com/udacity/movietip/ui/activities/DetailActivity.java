@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,15 +28,14 @@ import com.bumptech.glide.request.transition.Transition;
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
-import com.udacity.movietip.data.adapters.TrailersAdapter.ItemClickListener;
 
+import com.udacity.movietip.data.db.DataRepository;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.Reviews;
 import com.udacity.movietip.data.model.ReviewsViewModel;
 import com.udacity.movietip.data.model.Trailers;
 import com.udacity.movietip.data.model.TrailersViewModel;
-import com.udacity.movietip.ui.utils.EqualSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +59,6 @@ public class DetailActivity
     private CollapsingToolbarLayout mCollapsingToolbar;
     private TextView mReleaseDateTextView;
     private TextView mOverViewTextView;
-    private RatingBar mRatingBar;
     private TextView mVoteCountTextview;
     private android.support.v7.widget.Toolbar mToolbar;
     private ImageButton mFavoritesButton;
@@ -74,7 +71,7 @@ public class DetailActivity
     private MovieViewModel mMovieViewModel;
     private TrailersViewModel mTrailersViewModel;
     private ReviewsViewModel mReviewsViewModel;
-
+    private DataRepository mRepository;
 
     public DetailActivity() {
         mContext = this;
@@ -95,6 +92,7 @@ public class DetailActivity
         mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
         mTrailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
         mReviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+        mRepository = new DataRepository(getApplication());
 
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_ITEM)) {
@@ -115,7 +113,6 @@ public class DetailActivity
             }
 
         } else {
-
             trailersList = new ArrayList<>();
             reviewsList = new ArrayList<>();
 
@@ -131,10 +128,30 @@ public class DetailActivity
 
         populateUI(movie);
 
+
+        //todo https://medium.com/sears-israel/when-and-why-to-use-android-livedata-93d7dd949138
+        final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                if (movies != null) {
+                    if (movies.contains(movie)){
+                        mFavoritesButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+                    }else {
+                        mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                    }
+                }
+            }
+        };
+
+        mMovieViewModel.getAllMovies().observe(this, movieListObserver);
+
+
+        // DO NOT MESS WITH TOGGLE!!! IT'S WORKING FINE TO SET/DELETE FAVORITES.
+        // FIGURE OUT THE SETTING OF FAVORITE BUTTON SOMEWHERE ELSE!!!!
         mFavoritesButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                mMovieViewModel.toggleFavorite(movie);
+                mRepository.toggleFavorite(movie);
             }
         });
 
@@ -143,11 +160,9 @@ public class DetailActivity
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-
         mTrailersRecyclerView.setAdapter(mTrailersAdapter);
         mReviewsRecyclerView.setAdapter(mReviewsAdapter);
     }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -157,22 +172,22 @@ public class DetailActivity
         super.onSaveInstanceState(outState);
     }
 
+
     private void initRecyclerViews() {
 
         RecyclerView.LayoutManager mTrailersLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         mTrailersRecyclerView.setLayoutManager(mTrailersLayoutManager);
-        mTrailersRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
         mTrailersRecyclerView.setHasFixedSize(true);
 
         RecyclerView.LayoutManager mReviewsLayoutManager = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
         mReviewsRecyclerView.setLayoutManager(mReviewsLayoutManager);
-        mReviewsRecyclerView.addItemDecoration(new EqualSpacingItemDecoration(16, EqualSpacingItemDecoration.HORIZONTAL));
         mReviewsRecyclerView.setHasFixedSize(true);
 
         final List<Trailers> trailersList = new ArrayList<>();
-        mTrailersAdapter = new TrailersAdapter(this, trailersList, new ItemClickListener() {
+        // Reference: https://www.codeproject.com/Tips/1229751/Handle-Click-Events-of-Multiple-Buttons-Inside-a
+        mTrailersAdapter = new TrailersAdapter(this, trailersList, new TrailersAdapter.ItemClickListener() {
             @Override
-            public void onItemClick(int clickedItemIndex) {
+            public void trailerOnClick(View v, int clickedItemIndex) {
                 // grab the clicked trailer
                 Trailers trailer = trailersList.get(clickedItemIndex);
 
@@ -184,6 +199,24 @@ public class DetailActivity
                 Intent chooser = Intent.createChooser(trailerIntent, "Choose Player");
 
                 if (trailerIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(chooser);
+                }
+            }
+
+            @Override
+            public void shareOnClick(View v, int clickedItemIndex) {
+                // create share intent
+                Trailers trailer = trailersList.get(clickedItemIndex);
+
+                // Reference: https://developer.android.com/training/sharing/
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, trailer.getTrailerUrl());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                Intent chooser = Intent.createChooser(intent, "Share video to...");
+
+                if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(chooser);
                 }
             }
@@ -211,12 +244,11 @@ public class DetailActivity
 
     private void initViews() {
 
-        mPosterImageView = findViewById(R.id.detail_movie_poster_imageView);
+        mPosterImageView = findViewById(R.id.movie_poster_imageView);
         mBackdropImageView = findViewById(R.id.detail_movie_backdrop_imageView);
         mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
         mReleaseDateTextView = findViewById(R.id.detail_movie_release_date);
         mOverViewTextView = findViewById(R.id.detail_movie_overview);
-        mRatingBar = findViewById(R.id.movie_detail_vote_average);
         mVoteCountTextview = findViewById(R.id.detail_movie_vote_count_textView);
         mToolbar = findViewById(R.id.toolbar);
         mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
@@ -232,22 +264,21 @@ public class DetailActivity
             return;
         }
 
-        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        boolean isLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         mCollapsingToolbar.setTitle(movie.getTitle());
         mReleaseDateTextView.setText(movie.getReleaseDate());
         mOverViewTextView.setText(movie.getOverview());
-        mRatingBar.setRating(movie.getVoteAverage());
         mVoteCountTextview.setText(String.valueOf(movie.getVoteCount()));
 
         // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
-        if(isPortrait) {
-            setConstraintBackground(movie.getPosterUrl());
-        } else {
+        if(isLandscape) {
             setConstraintBackground(movie.getBackdropUrl());
-            loadImageIntoView(this, movie.getPosterUrl(), mPosterImageView);
+        } else {
+            setConstraintBackground(movie.getPosterUrl());
         }
 
+        loadImageIntoView(this, movie.getPosterUrl(), mPosterImageView);
         loadImageIntoView(this, movie.getBackdropUrl(), mBackdropImageView);
     }
 
@@ -307,4 +338,6 @@ public class DetailActivity
         });
 
     }
+
+
 }
