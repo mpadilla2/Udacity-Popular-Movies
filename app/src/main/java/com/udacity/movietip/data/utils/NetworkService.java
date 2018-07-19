@@ -8,12 +8,14 @@ import android.net.ConnectivityManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
-import com.udacity.movietip.data.utils.NetWorkReceiver.NetWorkReceiverListener;
+// Reference: explained https://medium.com/google-developers/scheduling-jobs-like-a-pro-with-jobscheduler-286ef8510129
+// Reference: http://www.singhajit.com/notify-android-device-network-status-changes/
 // jobservice requires min sdk 21. that leaves 10% of KitKat users behind: https://developer.android.com/about/dashboards/
 public class NetworkService extends JobService implements NetWorkReceiver.NetWorkReceiverListener{
 
     private static NetWorkReceiver mNetworkReceiver;
-    public static final String NETWORK_STATUS = "isConnected";
+    public static final String NETWORK_AVAILABLE_ACTION = "com.udacity.movietip.NetworkAvailable";
+    public static final String NETWORK_STATUS = "isNetworkAvailable";
 
     @Override
     public void onCreate() {
@@ -43,11 +45,14 @@ public class NetworkService extends JobService implements NetWorkReceiver.NetWor
 
     @Override
     public void onNetworkChanged(boolean isConnected) {
-        // instead of string message use LocalBroadcast to let my app know there's a connection
+        // TODO instead of string message use LocalBroadcast to let my app know there's a connection
         String message = isConnected ? "Yep, device has a network connection" : "Oops! No network connection!";
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
-        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        Intent networkStatusIntent = new Intent(NETWORK_AVAILABLE_ACTION);
+        networkStatusIntent.putExtra(NETWORK_STATUS, isConnected);
 
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.sendBroadcast(networkStatusIntent);
     }
 }

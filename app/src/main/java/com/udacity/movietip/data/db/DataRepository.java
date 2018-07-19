@@ -16,6 +16,8 @@ import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
 import com.udacity.movietip.data.utils.AppExecutors;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -114,50 +116,6 @@ public class DataRepository {
             public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
                 // do something here
                 Log.d("DATAREPOSITORY", "LOADING FROM INTERNET API FOR " + category + "FAILED");
-            }
-        });
-        return data;
-    }
-
-
-    public LiveData<List<Trailers>> getAllTrailers(int movieId) {
-
-        final MutableLiveData<List<Trailers>> data = new MutableLiveData<>();
-
-        mService.getTrailers(movieId).enqueue(new Callback<TrailersIndexed>() {
-            @Override
-            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    data.setValue(Objects.requireNonNull(response.body()).getResults());
-                    Log.d("DataRepository", "loaded trailers from internet api");
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
-                Log.d("DataRepository", "Loading from internet api failed");
-            }
-        });
-        return data;
-    }
-
-
-    public LiveData<List<Reviews>> getAllReviews(int movieId) {
-
-        final MutableLiveData<List<Reviews>> data = new MutableLiveData<>();
-
-        mService.getReviews(movieId).enqueue(new Callback<ReviewsIndexed>() {
-            @Override
-            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
-                assert response.body() != null;
-                data.setValue(Objects.requireNonNull(response.body()).getResults());
-                Log.d("DataRepository", "Loaded reviews from internet api");
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
-                Log.d("DataRepository", "Loading from internet api failed");
             }
         });
         return data;

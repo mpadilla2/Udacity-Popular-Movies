@@ -15,11 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -33,12 +33,19 @@ import com.udacity.movietip.data.db.DataRepository;
 import com.udacity.movietip.data.model.FavoriteMoviesViewModel;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.Reviews;
-import com.udacity.movietip.data.model.ReviewsViewModel;
+import com.udacity.movietip.data.model.ReviewsIndexed;
 import com.udacity.movietip.data.model.Trailers;
-import com.udacity.movietip.data.model.TrailersViewModel;
+import com.udacity.movietip.data.model.TrailersIndexed;
+import com.udacity.movietip.data.remote.ApiService;
+import com.udacity.movietip.data.utils.ApiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity
         extends AppCompatActivity{
@@ -68,8 +75,6 @@ public class DetailActivity
     private Movie movie;
     private ArrayList<Trailers> trailersList;
     private ArrayList<Reviews> reviewsList;
-    private TrailersViewModel mTrailersViewModel;
-    private ReviewsViewModel mReviewsViewModel;
     private DataRepository mRepository;
 
     public DetailActivity() {
@@ -160,8 +165,6 @@ public class DetailActivity
 
     private void setUpViewModels(){
 
-        mTrailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
-        mReviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
         FavoriteMoviesViewModel mFavoriteMoviesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
 
         //todo https://medium.com/sears-israel/when-and-why-to-use-android-livedata-93d7dd949138
@@ -326,26 +329,41 @@ public class DetailActivity
 
 
     private void loadTrailers(int movieId){
-        mTrailersViewModel.getAllTrailers(movieId).observe(this, new Observer<List<Trailers>>() {
+        ApiService mService = ApiUtils.getApiService();
+        mService.getTrailers(movieId).enqueue(new Callback<TrailersIndexed>() {
             @Override
-            public void onChanged(@Nullable List<Trailers> trailersList) {
-                Log.d("DetailActivity", "Updating list of Trailers from TMDB api LiveData in ViewModel");
+            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
+                assert response.body() != null;
+                trailersList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
+                Toast.makeText(getBaseContext(), "Retrieval of TRAILERS successful!", Toast.LENGTH_SHORT).show();
                 mTrailersAdapter.setTrailersList(trailersList);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
+                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
 
     private void loadReviews(int movieId){
-        mReviewsViewModel.getAllReviews(movieId).observe(this, new Observer<List<Reviews>>() {
+
+        ApiService mService = ApiUtils.getApiService();
+        mService.getReviews(movieId).enqueue(new Callback<ReviewsIndexed>() {
             @Override
-            public void onChanged(@Nullable List<Reviews> reviews) {
-                Log.d("DetailActivity", "Updating list of Reviews from TMDB api LiveData in ViewModel");
-                mReviewsAdapter.setReviewsList(reviews);
+            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
+                assert response.body() != null;
+                reviewsList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
+                Toast.makeText(getBaseContext(), "Retrieval of REVIEWS successful!", Toast.LENGTH_SHORT).show();
+                //mAdapter.setMoviesList(movieList);
+                mReviewsAdapter.setReviewsList(reviewsList);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
+                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
-
-
 }

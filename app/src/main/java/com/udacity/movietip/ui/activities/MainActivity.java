@@ -29,9 +29,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
 
     /*
-    TODO Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
     TODO Bug: In landscape view trailers card is too large for screen
-    TODO Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
     TODO trailers view title is being cut off at the end instead of wrapping
     TODO logic is wrong on setting favorite heart image. sometimes have to click multiple times to get it to change
     TODO Implement onsaveinstancestate for scrolled position
@@ -55,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     COMPLETED ITEMS:
     DONE fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
         On rotate, they are again querying for data instead of reusing the livedata.
+    DONE Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
+    DONE Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
 
 
     REFERENCES:
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // scheduleNetworkCheckJob();
+        scheduleNetworkCheckJob();
 
         mContext = this;
         setContentView(R.layout.activity_main);
@@ -257,14 +257,14 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     @Override
     protected void onStart() {
         super.onStart();
-        //Intent startNetworkServiceIntent = new Intent(this, NetworkService.class);
-        //startService(startNetworkServiceIntent);
+        Intent startNetworkServiceIntent = new Intent(this, NetworkService.class);
+        startService(startNetworkServiceIntent);
     }
 
 
     @Override
     protected void onStop() {
-        //stopService(new Intent(this, NetworkService.class));
+        stopService(new Intent(this, NetworkService.class));
         super.onStop();
     }
 
