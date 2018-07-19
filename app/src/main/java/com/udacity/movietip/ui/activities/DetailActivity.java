@@ -30,8 +30,8 @@ import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
 
 import com.udacity.movietip.data.db.DataRepository;
+import com.udacity.movietip.data.model.FavoriteMoviesViewModel;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.Reviews;
 import com.udacity.movietip.data.model.ReviewsViewModel;
 import com.udacity.movietip.data.model.Trailers;
@@ -68,7 +68,6 @@ public class DetailActivity
     private Movie movie;
     private ArrayList<Trailers> trailersList;
     private ArrayList<Reviews> reviewsList;
-    private MovieViewModel mMovieViewModel;
     private TrailersViewModel mTrailersViewModel;
     private ReviewsViewModel mReviewsViewModel;
     private DataRepository mRepository;
@@ -88,10 +87,8 @@ public class DetailActivity
 
         initViews();
         initRecyclerViews();
+        setUpViewModels();
 
-        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
-        mTrailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
-        mReviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
         mRepository = new DataRepository(getApplication());
 
         if (savedInstanceState != null){
@@ -126,8 +123,46 @@ public class DetailActivity
             loadReviews(movie.getId());
         }
 
-        populateUI(movie);
 
+        populateUI(movie);
+        setUpFavoritesButton();
+        setSupportActionBar(mToolbar);
+
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(SAVED_INSTANCE_MOVIE_ITEM, movie);
+        outState.putParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM, reviewsList);
+        outState.putParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM, trailersList);
+        super.onSaveInstanceState(outState);
+    }
+
+
+    private void setUpFavoritesButton() {
+        // DO NOT MESS WITH TOGGLE!!! IT'S WORKING FINE TO SET/DELETE FAVORITES.
+        // FIGURE OUT THE SETTING OF FAVORITE BUTTON SOMEWHERE ELSE!!!!
+        mFavoritesButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                mRepository.toggleFavorite(movie);
+            }
+        });
+    }
+
+
+    private void setUpViewModels(){
+
+        mTrailersViewModel = ViewModelProviders.of(this).get(TrailersViewModel.class);
+        mReviewsViewModel = ViewModelProviders.of(this).get(ReviewsViewModel.class);
+        FavoriteMoviesViewModel mFavoriteMoviesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
 
         //todo https://medium.com/sears-israel/when-and-why-to-use-android-livedata-93d7dd949138
         final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
@@ -142,34 +177,7 @@ public class DetailActivity
                 }
             }
         };
-
-        mMovieViewModel.getAllMovies().observe(this, movieListObserver);
-
-
-        // DO NOT MESS WITH TOGGLE!!! IT'S WORKING FINE TO SET/DELETE FAVORITES.
-        // FIGURE OUT THE SETTING OF FAVORITE BUTTON SOMEWHERE ELSE!!!!
-        mFavoritesButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                mRepository.toggleFavorite(movie);
-            }
-        });
-
-        setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
-        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(SAVED_INSTANCE_MOVIE_ITEM, movie);
-        outState.putParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM, reviewsList);
-        outState.putParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM, trailersList);
-        super.onSaveInstanceState(outState);
+        mFavoriteMoviesViewModel.getAllMovies().observe(this, movieListObserver);
     }
 
 

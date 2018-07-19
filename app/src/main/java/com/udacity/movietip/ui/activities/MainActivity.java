@@ -29,8 +29,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
 
     /*
-    TODO fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
-        On rotate, they are again querying for data instead of reusing the livedata.
     TODO Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
     TODO Bug: In landscape view trailers card is too large for screen
     TODO Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
@@ -53,6 +51,13 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     http://codinginfinite.com/android-paging-library-example/
     https://codelabs.developers.google.com/codelabs/android-paging/index.html#0
 
+
+    COMPLETED ITEMS:
+    DONE fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
+        On rotate, they are again querying for data instead of reusing the livedata.
+
+
+    REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
     https://developer.android.com/guide/components/fragments
     https://developer.android.com/guide/components/fragments#Lifecycle
@@ -61,52 +66,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     https://developer.android.com/training/data-storage/sqlite
     https://developer.android.com/guide/components/intents-common#PlayMedia
     https://developer.android.com/training/data-storage/sqlite
-
-
-    DONE Bug: fragments are now using livedata instead of onsavedinstancestate.
-        But on rotate there are two viewmodels for each fragment now. This is a known bug in Android talked about in this post:
-        https://medium.com/@BladeCoder/architecture-components-pitfalls-part-1-9300dd969808
-        I've tried implementing #3 and #4 but it's not working. I must be missing something.
-    DONE 1 bug makes app not adhere to rubric. 1. on rotation needs to use livedata and not onsaveinstancestate
-          Have removed savedinstance state from fragment and am using livedata soley
-          In Portrait, all posters load fine. When rotated, all tabs are blank. The same is true if I start in landscape mode and rotate to portrait.
-          I'm missing a piece somewhere, that doesn't restore the livedata for the existing fragments that get shown and hidden.
-    DONE Bug: In landscape view trailers are overlapping all other information
-    DONE Bug: The favorites heart is missing in portrait
-    DONE Change rating bar to just numbers
-    DONE Bug: Movie poster isn't displaying in portrait view BUT works in landscape view
-    DONE Fragment transitions
-    DONE don't recreate fragments when clicking between tabs
-    DONE Implement onsaveinstancestate for fragment
-    DONE Implement onsaveinstancestate for bottomnavigation
-    DONE Favorites tab does not refresh when I toggle a favorite from the favorites tab. see steps to recreate in notepadqq or git commit
-    DONE trailer share intent not sending link
-    DONE movie trailer share button is set in trailersadapter. but the clicklistener is also set here so it will launch youtube also. need it to launch sharing capabilities.
-    DONE Replace equalspacingitemdecoration in trailers and reviews
-    DONE gridview in main fragment; borders are not even
-    DONE set favorite heart based favorite movie status that you're viewing
-    DONE When viewing detail activity for a movie; it also launches the review in the background; can see it when closing my app
-    DONE implement livedata for configuration changes and saving state
-    DONE Bottomnavigation can't tell which item is selected as the text and icon don't stand out.
-        this is because you HAVE to click twice for it to recognize you selected a bottomnavigation item
-    DONE Change Detail activity to be a cardview
-    DONE Make trailers and reviews clickable
-    DONE Create Trailers models
-    DONE Create Reviews models
-    DONE modify apiservice to add reviews and trailers calls
-    DONE add method to DetailActivity to call for trailers
-    DONE add method to DetailActivity to call for reviews
-    DONE Display trailers in detail activity
-        if video then make api call and pass the movie id
-    DONE Launch trailers with intent to youtube or other player
-        use glide to load it into imageview with thumbnail and intent to launch player
-    DONE Display reviews in detail activity. make api call and pass movie id to retrieve reviews
-    DONE Implement database for favorites using room
-    DONE Add favorites fragment -
-    DONE pull favorites from database or else nothing
-    DONE display favorites from database. Need to add check if tag is favorites, then do different calls to database
-    DONE Detail activity add button or other to add/deleteMovie favorites from database
-    DONE implement broadcast receiver as jobservice to check internet
      */
 
 
@@ -115,14 +74,11 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
       Reference: https://www.simplifiedcoding.net/bottom-navigation-android-example
       Reference: https://materialdoc.com/components/bottom-navigation/
      */
-
     private static final String MOVIE_ITEM = "Movie Item";
     private static final String MOVIES_POPULAR = "popular";
     private static final String MOVIES_TOP_RATED = "top_rated";
     private static final String MOVIES_NOW_PLAYING = "now_playing";
     private static final String MOVIES_FAVORITES = "favorites";
-    private static final String BOTTOM_NAV_SELECTED = "Bottom Navigation Selected";
-    private static final String FRAGMENT_TAG = "Saved Fragment Tag";
     private String fragmentTag = "";
     FragmentManager fragmentManager;
     Fragment taggedFragment;
@@ -175,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
                         break;
                 }
 
-                initFragment();
+                initFragment(fragmentTag);
 
                 return true;
             }
@@ -184,21 +140,28 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         if (savedInstanceState == null) {
             navigationBottom.setSelectedItemId(R.id.navigation_popular);
         } else {
-            if (savedInstanceState.containsKey(BOTTOM_NAV_SELECTED)){
-                navigationBottom.setSelectedItemId(savedInstanceState.getInt(BOTTOM_NAV_SELECTED));
-            }
             if (savedInstanceState.containsKey(MOVIES_POPULAR)){
+                Log.d("MainActivity", "POPULAR FRAGMENT SAVED INSTANCE");
                 fragmentManager.getFragment(savedInstanceState, MOVIES_POPULAR);
             }
             if (savedInstanceState.containsKey(MOVIES_TOP_RATED)){
+                Log.d("MainActivity", "TOP RATED FRAGMENT SAVED INSTANCE");
                 fragmentManager.getFragment(savedInstanceState, MOVIES_TOP_RATED);
             }
             if (savedInstanceState.containsKey(MOVIES_NOW_PLAYING)){
+                Log.d("MainActivity", "NOW PLAYING FRAGMENT SAVED INSTANCE");
                 fragmentManager.getFragment(savedInstanceState, MOVIES_NOW_PLAYING);
             }
             if (savedInstanceState.containsKey(MOVIES_FAVORITES)){
+                Log.d("MainActivity", "FAVORITES FRAGMENT SAVED INSTANCE");
                 fragmentManager.getFragment(savedInstanceState, MOVIES_FAVORITES);
             }
+/*            if (savedInstanceState.containsKey(BOTTOM_NAV_SELECTED)){
+                int savedInt = savedInstanceState.getInt(BOTTOM_NAV_SELECTED);
+                // I confirmed with this log entry that only one selected item is saved
+                Log.d("MainActivity", "SELECTED ITEM " + savedInt + " SAVED INSTANCE");
+                navigationBottom.setSelectedItemId(savedInt);
+            }*/
         }
 
 
@@ -222,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
        Hence, I will not add the fragments to back stack.
        Reference: https://material.io/design/components/bottom-navigation.html#behavior
     */
-    private void initFragment() {
+    private void initFragment(String tag) {
         // Per Material Design transition between bottom navigation views using cross-fade animation
         // Reference: https://material.io/design/components/bottom-navigation.html#behavior
         int fadeIn = android.R.anim.fade_in;
@@ -250,8 +213,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             }
         }
 
-        fragmentTransaction
-                .commit();
+        fragmentTransaction.commitNow();
     }
 
 
@@ -266,9 +228,10 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
       */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // save the currently selected tab in bottom navigation
-        outState.putInt(BOTTOM_NAV_SELECTED, navigationBottom.getSelectedItemId());
+        super.onSaveInstanceState(outState);
 
+        // save the currently selected tab in bottom navigation
+        //outState.putInt(BOTTOM_NAV_SELECTED, navigationBottom.getSelectedItemId());
         // locate created fragments first
         Fragment popular = fragmentManager.findFragmentByTag(MOVIES_POPULAR);
         Fragment topRated = fragmentManager.findFragmentByTag(MOVIES_TOP_RATED);
@@ -280,8 +243,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         if (topRated != null) fragmentManager.putFragment(outState, MOVIES_TOP_RATED, topRated);
         if (nowPlaying != null)fragmentManager.putFragment(outState, MOVIES_NOW_PLAYING, nowPlaying);
         if (favorites != null) fragmentManager.putFragment(outState, MOVIES_FAVORITES, favorites);
-
-        super.onSaveInstanceState(outState);
     }
 
 

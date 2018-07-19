@@ -1,7 +1,5 @@
 package com.udacity.movietip.ui.fragments;
 
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -23,8 +21,11 @@ import android.view.ViewGroup;
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.MovieGridAdapter;
 import com.udacity.movietip.data.adapters.MovieGridAdapter.GridItemClickListener;
+import com.udacity.movietip.data.model.FavoriteMoviesViewModel;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.MovieViewModel;
+import com.udacity.movietip.data.model.NowPlayingMoviesViewModel;
+import com.udacity.movietip.data.model.PopularMoviesViewModel;
+import com.udacity.movietip.data.model.TopRatedMoviesViewModel;
 import com.udacity.movietip.ui.utils.GridSpacingItemDecoration;
 
 import java.util.ArrayList;
@@ -32,10 +33,13 @@ import java.util.List;
 import java.util.Objects;
 
 // Todo https://google-developer-training.gitbooks.io/android-developer-advanced-course-concepts/unit-1-expand-the-user-experience/lesson-1-fragments/1-2-c-fragment-lifecycle-and-communications/1-2-c-fragment-lifecycle-and-communications.html
-public class MovieGridFragment extends ViewLifecycleFragment implements LifecycleObserver{
+public class MovieGridFragment extends ViewLifecycleFragment{
 
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
-    private static final String MOVIES_POPULAR_PATH = "popular";
+    private static final String MOVIES_POPULAR = "popular";
+    private static final String MOVIES_TOP_RATED = "top_rated";
+    private static final String MOVIES_NOW_PLAYING = "now_playing";
+    private static final String MOVIES_FAVORITES = "favorites";
 
     private Context mContext;
     private MovieGridAdapter mAdapter;
@@ -45,8 +49,12 @@ public class MovieGridFragment extends ViewLifecycleFragment implements Lifecycl
     private static final String SAVED_GRID_STATE = "Saved Grid State";
     private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
     private String mCategory;
-    private MovieViewModel mMovieViewModel;
     private RecyclerView mRecyclerView;
+    private PopularMoviesViewModel mPopularMoviesViewModel;
+    private TopRatedMoviesViewModel mTopRatedMoviesViewModel;
+    private NowPlayingMoviesViewModel mNowPlayingMoviesViewModel;
+    private FavoriteMoviesViewModel mFavoritesViewModel;
+
 
     /* Create a new instance of MovieGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment
@@ -65,7 +73,7 @@ public class MovieGridFragment extends ViewLifecycleFragment implements Lifecycl
     }
 
 
-/*    // Override onAttach to make sure that the container activity has implemented the callback
+    // Override onAttach to make sure that the container activity has implemented the callback
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -78,7 +86,7 @@ public class MovieGridFragment extends ViewLifecycleFragment implements Lifecycl
             throw new ClassCastException(context.toString()
                     + " must implement OnImageClickListener");
         }
-    }*/
+    }
 
 
     @Override
@@ -112,16 +120,34 @@ public class MovieGridFragment extends ViewLifecycleFragment implements Lifecycl
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCategory = getArguments() != null ? getArguments().getString("category") : MOVIES_POPULAR_PATH;
-
+        // savedInstanceState check for previous category instance
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(SAVED_FRAGMENT_CATEGORY)){
                 mCategory = savedInstanceState.getString(SAVED_FRAGMENT_CATEGORY);
+                Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY EXISTS AS " + mCategory);
             }
+        } else {
+            // getArguments category for initial Fragment creation
+            mCategory = getArguments() != null ? getArguments().getString("category") : MOVIES_POPULAR;
+            Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY DOESN'T EXIST! CREATING NEW " + mCategory);
         }
 
-        if (mCategory != null) loadMovies(mCategory);
+        switch (mCategory){
+            case MOVIES_POPULAR:
+                mPopularMoviesViewModel = ViewModelProviders.of(this).get(PopularMoviesViewModel.class);
+                break;
+            case MOVIES_TOP_RATED:
+                mTopRatedMoviesViewModel = ViewModelProviders.of(this).get(TopRatedMoviesViewModel.class);
+                break;
+            case MOVIES_NOW_PLAYING:
+                mNowPlayingMoviesViewModel = ViewModelProviders.of(this).get(NowPlayingMoviesViewModel.class);
+                break;
+            case MOVIES_FAVORITES:
+                mFavoritesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
+                break;
+        }
 
+        loadMovies(mCategory);
     }
 
 
@@ -159,34 +185,27 @@ public class MovieGridFragment extends ViewLifecycleFragment implements Lifecycl
 
     private void loadMovies(String category){
 
-        mMovieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
-        final Observer<List<Movie>> movieList;
-        LifecycleOwner viewLifecycleOwner = getViewLifecycleOwner();
-
-        if (!category.equals("favorites")){
-            movieList = new Observer<List<Movie>>() {
-                @Override
-                public void onChanged(@Nullable List<Movie> movies) {
-                    Log.d("MASTERGRIDFRAGMENT", "UPDATING LIST OF MOVIES FROM INTERNET API AND LIVEDATA MODEL");
-                    mAdapter.setMoviesList(movies);
-                }
-            };
-
-            if (viewLifecycleOwner != null) {
-                mMovieViewModel.getAllMovies(category).observe(viewLifecycleOwner, movieList);
+        final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                mAdapter.setMoviesList(movies);
             }
-        } else {
-            movieList = new Observer<List<Movie>>() {
-                @Override
-                public void onChanged(@Nullable List<Movie> movies) {
-                    Log.d("MASTERGRIDFRAGMENT", "UPDATING LIST OF MOVIES FROM DATABASE LIVEDATA IN VIEWMODEL");
-                    mAdapter.setMoviesList(movies);
-                }
-            };
+        };
 
-            if (viewLifecycleOwner != null) {
-                mMovieViewModel.getAllMovies().observe(viewLifecycleOwner, movieList);
-            }
+
+        switch (mCategory){
+            case MOVIES_POPULAR:
+                mPopularMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
+                break;
+            case MOVIES_TOP_RATED:
+                mTopRatedMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
+                break;
+            case MOVIES_NOW_PLAYING:
+                mNowPlayingMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
+                break;
+            case MOVIES_FAVORITES:
+                mFavoritesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
+                break;
         }
     }
 

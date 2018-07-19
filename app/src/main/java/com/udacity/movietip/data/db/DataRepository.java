@@ -3,17 +3,10 @@ package com.udacity.movietip.data.db;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.model.Reviews;
 import com.udacity.movietip.data.model.ReviewsIndexed;
@@ -23,7 +16,6 @@ import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
 import com.udacity.movietip.data.utils.AppExecutors;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

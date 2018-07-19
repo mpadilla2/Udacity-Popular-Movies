@@ -22,5 +22,4 @@ public class TrailersViewModel extends AndroidViewModel{
         mAllTrailers = mRepository.getAllTrailers(movieId);
         return mAllTrailers;
     }
-
 }
