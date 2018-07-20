@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,44 +15,32 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.MovieGridAdapter;
 import com.udacity.movietip.data.adapters.MovieGridAdapter.GridItemClickListener;
-import com.udacity.movietip.data.model.FavoriteMoviesViewModel;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.NowPlayingMoviesViewModel;
-import com.udacity.movietip.data.model.PopularMoviesViewModel;
-import com.udacity.movietip.data.model.TopRatedMoviesViewModel;
+import com.udacity.movietip.data.model.MovieViewModel;
+import com.udacity.movietip.data.model.MovieViewModelFactory;
 import com.udacity.movietip.ui.utils.GridSpacingItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// Todo https://google-developer-training.gitbooks.io/android-developer-advanced-course-concepts/unit-1-expand-the-user-experience/lesson-1-fragments/1-2-c-fragment-lifecycle-and-communications/1-2-c-fragment-lifecycle-and-communications.html
+// done https://google-developer-training.gitbooks.io/android-developer-advanced-course-concepts/unit-1-expand-the-user-experience/lesson-1-fragments/1-2-c-fragment-lifecycle-and-communications/1-2-c-fragment-lifecycle-and-communications.html
 public class MovieGridFragment extends ViewLifecycleFragment{
 
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR = "popular";
-    private static final String MOVIES_TOP_RATED = "top_rated";
-    private static final String MOVIES_NOW_PLAYING = "now_playing";
-    private static final String MOVIES_FAVORITES = "favorites";
+    private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
 
     private Context mContext;
     private MovieGridAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private Parcelable mGridState;
-    private static final String SAVED_MOVIE_LIST = "Saved Movie List";
-    private static final String SAVED_GRID_STATE = "Saved Grid State";
-    private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
     private String mCategory;
-    private RecyclerView mRecyclerView;
-    private PopularMoviesViewModel mPopularMoviesViewModel;
-    private TopRatedMoviesViewModel mTopRatedMoviesViewModel;
-    private NowPlayingMoviesViewModel mNowPlayingMoviesViewModel;
-    private FavoriteMoviesViewModel mFavoritesViewModel;
+    private MovieViewModel mMovieViewModel;
 
 
     /* Create a new instance of MovieGridFragment, providing "category" as an argument.
@@ -102,12 +89,11 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_master_grid, container, false);
-        mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
+        RecyclerView mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
         mRecyclerView.setHasFixedSize(true);
-
-        mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
-
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
         mRecyclerView.setAdapter(mAdapter);
@@ -132,22 +118,22 @@ public class MovieGridFragment extends ViewLifecycleFragment{
             Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY DOESN'T EXIST! CREATING NEW " + mCategory);
         }
 
-        switch (mCategory){
-            case MOVIES_POPULAR:
-                mPopularMoviesViewModel = ViewModelProviders.of(this).get(PopularMoviesViewModel.class);
-                break;
-            case MOVIES_TOP_RATED:
-                mTopRatedMoviesViewModel = ViewModelProviders.of(this).get(TopRatedMoviesViewModel.class);
-                break;
-            case MOVIES_NOW_PLAYING:
-                mNowPlayingMoviesViewModel = ViewModelProviders.of(this).get(NowPlayingMoviesViewModel.class);
-                break;
-            case MOVIES_FAVORITES:
-                mFavoritesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
-                break;
+        setUpViewModel();
+
+        // If the network is available, make the tmdb api call with the appropriate category for the fragment
+        if (isActiveNetwork()){
+            loadMovies(mCategory);
+        } else {
+            Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
         }
 
-        loadMovies(mCategory);
+    }
+
+
+    private void setUpViewModel() {
+        MovieViewModelFactory movieViewModelFactory = new MovieViewModelFactory(Objects.requireNonNull(getActivity())
+                .getApplication(), mCategory);
+        mMovieViewModel = ViewModelProviders.of(this, movieViewModelFactory).get(MovieViewModel.class);
     }
 
 
@@ -192,21 +178,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
             }
         };
 
-
-        switch (mCategory){
-            case MOVIES_POPULAR:
-                mPopularMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
-                break;
-            case MOVIES_TOP_RATED:
-                mTopRatedMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
-                break;
-            case MOVIES_NOW_PLAYING:
-                mNowPlayingMoviesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
-                break;
-            case MOVIES_FAVORITES:
-                mFavoritesViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
-                break;
-        }
+        mMovieViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
     }
 
 

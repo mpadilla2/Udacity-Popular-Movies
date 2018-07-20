@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -30,22 +32,16 @@ import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
 
 import com.udacity.movietip.data.db.DataRepository;
-import com.udacity.movietip.data.model.FavoriteMoviesViewModel;
 import com.udacity.movietip.data.model.Movie;
+import com.udacity.movietip.data.model.MovieViewModel;
+import com.udacity.movietip.data.model.MovieViewModelFactory;
 import com.udacity.movietip.data.model.Reviews;
-import com.udacity.movietip.data.model.ReviewsIndexed;
 import com.udacity.movietip.data.model.Trailers;
-import com.udacity.movietip.data.model.TrailersIndexed;
-import com.udacity.movietip.data.remote.ApiService;
-import com.udacity.movietip.data.utils.ApiUtils;
+import com.udacity.movietip.data.model.TrailersReviewsViewModel;
+import com.udacity.movietip.data.model.TrailersReviewsViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DetailActivity
         extends AppCompatActivity{
@@ -73,8 +69,8 @@ public class DetailActivity
     private RecyclerView mReviewsRecyclerView;
 
     private Movie movie;
-    private ArrayList<Trailers> trailersList;
-    private ArrayList<Reviews> reviewsList;
+/*    private ArrayList<Trailers> trailersList;
+    private ArrayList<Reviews> reviewsList;*/
     private DataRepository mRepository;
 
     public DetailActivity() {
@@ -92,7 +88,7 @@ public class DetailActivity
 
         initViews();
         initRecyclerViews();
-        setUpViewModels();
+        setUpFavoritesViewModel();
 
         mRepository = new DataRepository(getApplication());
 
@@ -100,34 +96,20 @@ public class DetailActivity
             if (savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_ITEM)) {
                 movie = savedInstanceState.getParcelable(SAVED_INSTANCE_MOVIE_ITEM);
             }
-            if (savedInstanceState.containsKey(SAVED_INSTANCE_REVIEWS_ITEM)) {
-                reviewsList = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM);
-            }
-            if (savedInstanceState.containsKey(SAVED_INSTANCE_TRAILERS_ITEM)) {
-                trailersList = savedInstanceState.getParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM);
-            }
-
-            if (trailersList != null) {
-                mTrailersAdapter.setTrailersList(trailersList);
-            }
-            if (reviewsList != null){
-                mReviewsAdapter.setReviewsList(reviewsList);
-            }
-
         } else {
-            trailersList = new ArrayList<>();
-            reviewsList = new ArrayList<>();
-
             Intent intent = getIntent();
 
             if (intent != null && intent.hasExtra(EXTRA_MOVIE_ITEM)){
                 movie = intent.getParcelableExtra(EXTRA_MOVIE_ITEM);
             }
-
-            loadTrailers(movie.getId());
-            loadReviews(movie.getId());
         }
 
+        // If the network is available, make the tmdb api call with the appropriate movieId
+        if (isActiveNetwork()){
+            loadTrailersAndReviews();
+        } else {
+            Toast.makeText(this, "Oops! No network connection!", Toast.LENGTH_LONG).show();
+        }
 
         populateUI(movie);
         setUpFavoritesButton();
@@ -136,18 +118,50 @@ public class DetailActivity
         if (getSupportActionBar() != null){
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        mTrailersRecyclerView.setAdapter(mTrailersAdapter);
-        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
     }
 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(SAVED_INSTANCE_MOVIE_ITEM, movie);
-        outState.putParcelableArrayList(SAVED_INSTANCE_REVIEWS_ITEM, reviewsList);
-        outState.putParcelableArrayList(SAVED_INSTANCE_TRAILERS_ITEM, trailersList);
         super.onSaveInstanceState(outState);
+    }
+
+
+    private void loadTrailersAndReviews() {
+
+        TrailersReviewsViewModelFactory trailersReviewsViewModelFactory =
+                new TrailersReviewsViewModelFactory(getApplication(), movie.getId());
+
+        TrailersReviewsViewModel mTrailersReviewsViewModel = ViewModelProviders
+                .of(this, trailersReviewsViewModelFactory).get(TrailersReviewsViewModel.class);
+
+        final Observer<List<Trailers>> trailersListObserver = new Observer<List<Trailers>>() {
+            @Override
+            public void onChanged(@Nullable List<Trailers> trailersList) {
+                if (trailersList != null) {
+                    mTrailersAdapter.setTrailersList(trailersList);
+                    mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+                } else {
+                    mTrailersRecyclerView.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        final Observer<List<Reviews>> reviewsListObserver = new Observer<List<Reviews>>() {
+            @Override
+            public void onChanged(@Nullable List<Reviews> reviews) {
+                if (reviews != null){
+                    mReviewsAdapter.setReviewsList(reviews);
+                    mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+                } else {
+                    mReviewsRecyclerView.setVisibility(View.GONE);
+                }            }
+        };
+
+        mTrailersReviewsViewModel.getAllTrailers().observe(this, trailersListObserver);
+        mTrailersReviewsViewModel.getAllReviews().observe(this, reviewsListObserver);
+
     }
 
 
@@ -163,9 +177,10 @@ public class DetailActivity
     }
 
 
-    private void setUpViewModels(){
+    private void setUpFavoritesViewModel(){
 
-        FavoriteMoviesViewModel mFavoriteMoviesViewModel = ViewModelProviders.of(this).get(FavoriteMoviesViewModel.class);
+        MovieViewModelFactory movieViewModelFactory = new MovieViewModelFactory(this.getApplication(), "favorites");
+        MovieViewModel mFavoriteMoviesViewModel = ViewModelProviders.of(this, movieViewModelFactory).get(MovieViewModel.class);
 
         //todo https://medium.com/sears-israel/when-and-why-to-use-android-livedata-93d7dd949138
         final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
@@ -328,42 +343,18 @@ public class DetailActivity
     }
 
 
-    private void loadTrailers(int movieId){
-        ApiService mService = ApiUtils.getApiService();
-        mService.getTrailers(movieId).enqueue(new Callback<TrailersIndexed>() {
-            @Override
-            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
-                assert response.body() != null;
-                trailersList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
-                Toast.makeText(getBaseContext(), "Retrieval of TRAILERS successful!", Toast.LENGTH_SHORT).show();
-                mTrailersAdapter.setTrailersList(trailersList);
-            }
+    /*
+    Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
+    */
+    private boolean isActiveNetwork(){
 
-            @Override
-            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
-                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+        ConnectivityManager connectivityManager;
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-
-    private void loadReviews(int movieId){
-
-        ApiService mService = ApiUtils.getApiService();
-        mService.getReviews(movieId).enqueue(new Callback<ReviewsIndexed>() {
-            @Override
-            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
-                assert response.body() != null;
-                reviewsList = response.body() != null ? Objects.requireNonNull(response.body()).getResults() : null;
-                Toast.makeText(getBaseContext(), "Retrieval of REVIEWS successful!", Toast.LENGTH_SHORT).show();
-                //mAdapter.setMoviesList(movieList);
-                mReviewsAdapter.setReviewsList(reviewsList);
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
-                Toast.makeText(mContext, getString(R.string.internet_status), Toast.LENGTH_SHORT).show();
-            }
-        });
+        NetworkInfo networkInfo = null;
+        if (connectivityManager != null) {
+            networkInfo = connectivityManager.getActiveNetworkInfo();
+        }
+        return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
 }

@@ -1,9 +1,5 @@
 package com.udacity.movietip.ui.activities;
 
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
@@ -21,7 +17,6 @@ import android.view.MenuItem;
 import com.bumptech.glide.Glide;
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.utils.NetworkService;
 import com.udacity.movietip.ui.fragments.MovieGridFragment;
 
 import java.util.List;
@@ -29,17 +24,28 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
 
     /*
+    TODO scrolling_content use merges for landscape?
     TODO Bug: In landscape view trailers card is too large for screen
     TODO trailers view title is being cut off at the end instead of wrapping
     TODO logic is wrong on setting favorite heart image. sometimes have to click multiple times to get it to change
-    TODO Implement onsaveinstancestate for scrolled position
-    TODO Implement onsaveinstancestate for detail activity
-    TODO implement local broadcast receiver (in NetworkSe``rvice.java) for checking internet so fragments can do something with this info
     TODO Adhere to material design for margins, etc.
     TODO document references
-    TODO schedule job to download the data only if network is available
-    TODO once data is downloaded and applied to adapter, refresh the views with the data available
-    TODO implement paging. all fragments can use paging: if the user adds 200 favorites then it's going to need to pull in chunks of favorites and not the whole list at once. So when refactoring the only difference between the fragment objects is the datasource.
+
+
+    COMPLETED ITEMS:
+    DONE Convert static viewmodels to viewmodel factory using category as param
+    DONE Convert in DetailActivity loadtrailers and loadreviews to viewmodel factory using movieid as param
+    DONE can't figure it out; Implement onsaveinstancestate for scrolled position
+    DONE Bug: on rotate in detailactivity trailers and reviews disappear AGAIN
+    DONE Implement onsaveinstancestate for detail activity
+    DONE not implementing due to time constraints: implement local broadcast receiver (in NetworkSe``rvice.java) for checking internet so fragments can do something with this info
+    DONE once data is downloaded and applied to adapter, refresh the views with the data available
+    DONE fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
+        On rotate, they are again querying for data instead of reusing the livedata.
+    DONE Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
+    DONE Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
+    DONE can't figure out so moving on. schedule job to download the data only if network is available
+    DONE not implementing due to time constraints: implement paging. all fragments can use paging: if the user adds 200 favorites then it's going to need to pull in chunks of favorites and not the whole list at once. So when refactoring the only difference between the fragment objects is the datasource.
     Best one fits my scenario. But need to refactor fragment first and separate api type fragment from db type fragment.
     api type: has a: pagedlist recyclerview and adapter, tmdb datasource
     db type: has a: regular recyclerview and adapter, db datasource
@@ -48,13 +54,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     https://github.com/codepath/android_guides/wiki/Paging-Library-Guide
     http://codinginfinite.com/android-paging-library-example/
     https://codelabs.developers.google.com/codelabs/android-paging/index.html#0
-
-
-    COMPLETED ITEMS:
-    DONE fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
-        On rotate, they are again querying for data instead of reusing the livedata.
-    DONE Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
-    DONE Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
 
 
     REFERENCES:
@@ -80,9 +79,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     private static final String MOVIES_NOW_PLAYING = "now_playing";
     private static final String MOVIES_FAVORITES = "favorites";
     private String fragmentTag = "";
-    FragmentManager fragmentManager;
-    Fragment taggedFragment;
-    private static Context mContext;
+    private FragmentManager fragmentManager;
     private BottomNavigationView navigationBottom;
     private Toolbar toolBar;
 
@@ -90,9 +87,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        scheduleNetworkCheckJob();
-
-        mContext = this;
         setContentView(R.layout.activity_main);
 
         toolBar = findViewById(R.id.toolbar);
@@ -104,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
 
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
-         Check that the activity is using the layout version with the movie_grid_fragment_container FrameLayout */
+        */
         navigationBottom = findViewById(R.id.navigation);
         navigationBottom.setOnNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
             @Override
@@ -156,12 +150,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
                 Log.d("MainActivity", "FAVORITES FRAGMENT SAVED INSTANCE");
                 fragmentManager.getFragment(savedInstanceState, MOVIES_FAVORITES);
             }
-/*            if (savedInstanceState.containsKey(BOTTOM_NAV_SELECTED)){
-                int savedInt = savedInstanceState.getInt(BOTTOM_NAV_SELECTED);
-                // I confirmed with this log entry that only one selected item is saved
-                Log.d("MainActivity", "SELECTED ITEM " + savedInt + " SAVED INSTANCE");
-                navigationBottom.setSelectedItemId(savedInt);
-            }*/
         }
 
 
@@ -194,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction()
                 .setCustomAnimations(fadeIn, fadeOut, fadeIn, fadeOut );
 
-        taggedFragment = fragmentManager.findFragmentByTag(fragmentTag);
+        Fragment taggedFragment = fragmentManager.findFragmentByTag(fragmentTag);
 
         if ( taggedFragment != null){
             fragmentTransaction.show(taggedFragment);
@@ -217,21 +205,10 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     }
 
 
-    /* Could have potentially used the implicit saving and restoring of fragments. But for that to work you cannot override onSaveInstanceState.
-       In my case I need to save and restore BottomNavigationView.
-       Reference: https://stackoverflow.com/a/26225201
-       Fragments https://www.youtube.com/watch?v=k3IT-IJ0J98
-        save state: 13:35
-        setup is conditional: 14:21
-        restored are already attached: 15:27 - Fragments restored from instance state ARE attached to activity. Therefore you can use findfragmentByID or tag and it will be there
-        love the lifecycle: 16:02 - 6 states: Initializing; created; activity created; stopped; started; resumed
-      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        // save the currently selected tab in bottom navigation
-        //outState.putInt(BOTTOM_NAV_SELECTED, navigationBottom.getSelectedItemId());
         // locate created fragments first
         Fragment popular = fragmentManager.findFragmentByTag(MOVIES_POPULAR);
         Fragment topRated = fragmentManager.findFragmentByTag(MOVIES_TOP_RATED);
@@ -251,36 +228,5 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         final Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(MOVIE_ITEM, movie);
         startActivity(intent);
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Intent startNetworkServiceIntent = new Intent(this, NetworkService.class);
-        startService(startNetworkServiceIntent);
-    }
-
-
-    @Override
-    protected void onStop() {
-        stopService(new Intent(this, NetworkService.class));
-        super.onStop();
-    }
-
-
-    private void scheduleNetworkCheckJob(){
-        JobInfo jobInfo = new JobInfo.Builder(0, new ComponentName(this, NetworkService.class))
-                .setRequiresCharging(false)
-                .setMinimumLatency(1000)
-                .setOverrideDeadline(2000)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(false)
-                .build();
-
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (jobScheduler != null) {
-            jobScheduler.schedule(jobInfo);
-        }
     }
 }

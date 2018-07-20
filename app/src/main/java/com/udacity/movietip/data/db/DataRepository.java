@@ -5,7 +5,9 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.model.Reviews;
@@ -32,6 +34,8 @@ public class DataRepository {
     private FavoriteMoviesDAO favoriteMoviesDAO;
     private LiveData<List<Movie>> mAllMovies;
     private LiveData<Movie> mMovie;
+    private LiveData<List<Trailers>> mAllTrailers;
+    private LiveData<List<Reviews>> mAllReviews;
     private int movieCount;
 
     ApiService mService;
@@ -45,7 +49,7 @@ public class DataRepository {
 
 
     // Query is run on a background thread because we're returning LiveData.
-    public LiveData<List<Movie>> getAllMovies(){
+    public LiveData<List<Movie>> getAllFavoriteMovies(){
         mAllMovies = favoriteMoviesDAO.getAllMovies();
         Log.d("DATAREPOSITORY", "LOADED MOVIES FOR FAVORITES FROM DATABASE");
         return mAllMovies;
@@ -97,27 +101,83 @@ public class DataRepository {
 
 
     public LiveData<List<Movie>> getAllMovies(String category){
-        String language = "en_US";
-        int pageNum = 1;
 
-        final MutableLiveData<List<Movie>> data = new MutableLiveData<>();
+        if (!category.equals("favorites")) {
 
-        mService.getJSON(category, language, pageNum).enqueue(new Callback<MoviesIndexed>() {
+            String language = "en_US";
+            int pageNum = 1;
+
+            final MutableLiveData<List<Movie>> data = new MutableLiveData<>();
+
+            mService.getJSON(category, language, pageNum).enqueue(new Callback<MoviesIndexed>() {
+                @Override
+                public void onResponse(@NonNull Call<MoviesIndexed> call, @NonNull Response<MoviesIndexed> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null;
+                        data.setValue(Objects.requireNonNull(response.body()).getResults());
+                        Log.d("DATAREPOSITORY", "LOADED MOVIES FOR " + category + " FROM INTERNET API");
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
+                    // do something here
+                    Log.d("DATAREPOSITORY", "LOADING FROM INTERNET API FOR " + category + "FAILED");
+                }
+            });
+            return data;
+
+        } else {
+
+            return getAllFavoriteMovies();
+        }
+    }
+
+
+    public LiveData<List<Trailers>> getAllTrailers(int id){
+
+        final MutableLiveData<List<Trailers>> data = new MutableLiveData<>();
+
+        mService.getTrailers(id).enqueue(new Callback<TrailersIndexed>() {
             @Override
-            public void onResponse(@NonNull Call<MoviesIndexed> call, @NonNull Response<MoviesIndexed> response) {
-                if (response.isSuccessful()) {
+            public void onResponse(@NonNull Call<TrailersIndexed> call, @NonNull Response<TrailersIndexed> response) {
+                if (response.isSuccessful()){
                     assert response.body() != null;
                     data.setValue(Objects.requireNonNull(response.body()).getResults());
-                    Log.d("DATAREPOSITORY", "LOADED MOVIES FOR " + category + " FROM INTERNET API");
+                    Log.d("DATAREPOSITORY", "LOADED TRAILERS FOR " + id + " FROM INTERNET API");
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
-                // do something here
-                Log.d("DATAREPOSITORY", "LOADING FROM INTERNET API FOR " + category + "FAILED");
+            public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
+                Log.d("DATAREPOSITORY", "LOADING TRAILERS FROM INTERNET API FOR " + id + "FAILED");
             }
         });
+
+        return data;
+    }
+
+
+    public LiveData<List<Reviews>> getAllReviews(int id){
+
+        final MutableLiveData<List<Reviews>> data = new MutableLiveData<>();
+
+        mService.getReviews(id).enqueue(new Callback<ReviewsIndexed>() {
+            @Override
+            public void onResponse(@NonNull Call<ReviewsIndexed> call, @NonNull Response<ReviewsIndexed> response) {
+                if (response.isSuccessful()){
+                    assert response.body() != null;
+                    data.setValue(Objects.requireNonNull(response.body()).getResults());
+                    Log.d("DATAREPOSITORY", "LOADED REVIEWS FOR " + id + " FROM INTERNET API");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
+                Log.d("DATAREPOSITORY", "LOADING REVIEWS FROM INTERNET API FOR " + id + "FAILED");
+            }
+        });
+
         return data;
     }
 }

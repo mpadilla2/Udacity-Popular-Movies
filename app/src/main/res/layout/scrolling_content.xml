@@ -110,7 +110,9 @@
 
     </android.support.v7.widget.CardView>
 
-    <!-- TODO constraint settings work to set size of recyclerview and offset it to the left but the next recyclerview is not displaying. I need it to display the next one also -->
+    <!-- TODO constraint settings work to set size of recyclerview and offset it to the left but the next recyclerview is not displaying. I need it to display the next one also
+         maybe just put it back to use the same method as the reviews like I was doing before as it was working fine-->
+
     <android.support.v7.widget.RecyclerView
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/detail_movie_trailers_recyclerview"
