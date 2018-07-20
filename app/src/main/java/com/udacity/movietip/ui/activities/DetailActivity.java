@@ -31,10 +31,9 @@ import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.ReviewsAdapter;
 import com.udacity.movietip.data.adapters.TrailersAdapter;
 
-import com.udacity.movietip.data.db.DataRepository;
+import com.udacity.movietip.data.model.FavoriteMovieViewModel;
+import com.udacity.movietip.data.model.FavoriteMovieViewModelFactory;
 import com.udacity.movietip.data.model.Movie;
-import com.udacity.movietip.data.model.MovieViewModel;
-import com.udacity.movietip.data.model.MovieViewModelFactory;
 import com.udacity.movietip.data.model.Reviews;
 import com.udacity.movietip.data.model.Trailers;
 import com.udacity.movietip.data.model.TrailersReviewsViewModel;
@@ -48,8 +47,6 @@ public class DetailActivity
 
     private static final String EXTRA_MOVIE_ITEM = "Movie Item";
     private static final String SAVED_INSTANCE_MOVIE_ITEM = "Saved Movie";
-    private static final String SAVED_INSTANCE_REVIEWS_ITEM = "Saved Reviews";
-    private static final String SAVED_INSTANCE_TRAILERS_ITEM = "Saved Trailers";
     private static final int IMAGE_LOADING = R.drawable.ic_image_loading;
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
 
@@ -69,9 +66,7 @@ public class DetailActivity
     private RecyclerView mReviewsRecyclerView;
 
     private Movie movie;
-/*    private ArrayList<Trailers> trailersList;
-    private ArrayList<Reviews> reviewsList;*/
-    private DataRepository mRepository;
+    private FavoriteMovieViewModel favoriteMovieViewModel;
 
     public DetailActivity() {
         mContext = this;
@@ -88,9 +83,6 @@ public class DetailActivity
 
         initViews();
         initRecyclerViews();
-        setUpFavoritesViewModel();
-
-        mRepository = new DataRepository(getApplication());
 
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(SAVED_INSTANCE_MOVIE_ITEM)) {
@@ -104,7 +96,9 @@ public class DetailActivity
             }
         }
 
-        // If the network is available, make the tmdb api call with the appropriate movieId
+        setUpFavoritesViewModel();
+        setUpFavoritesButton();
+
         if (isActiveNetwork()){
             loadTrailersAndReviews();
         } else {
@@ -112,7 +106,6 @@ public class DetailActivity
         }
 
         populateUI(movie);
-        setUpFavoritesButton();
         setSupportActionBar(mToolbar);
 
         if (getSupportActionBar() != null){
@@ -166,12 +159,10 @@ public class DetailActivity
 
 
     private void setUpFavoritesButton() {
-        // DO NOT MESS WITH TOGGLE!!! IT'S WORKING FINE TO SET/DELETE FAVORITES.
-        // FIGURE OUT THE SETTING OF FAVORITE BUTTON SOMEWHERE ELSE!!!!
         mFavoritesButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                mRepository.toggleFavorite(movie);
+                favoriteMovieViewModel.toggleFavorite(movie);
             }
         });
     }
@@ -179,23 +170,22 @@ public class DetailActivity
 
     private void setUpFavoritesViewModel(){
 
-        MovieViewModelFactory movieViewModelFactory = new MovieViewModelFactory(this.getApplication(), "favorites");
-        MovieViewModel mFavoriteMoviesViewModel = ViewModelProviders.of(this, movieViewModelFactory).get(MovieViewModel.class);
+        FavoriteMovieViewModelFactory favoriteMovieViewModelFactory =
+                new FavoriteMovieViewModelFactory(getApplication(),movie);
+        favoriteMovieViewModel =
+                ViewModelProviders.of(this, favoriteMovieViewModelFactory).get(FavoriteMovieViewModel.class);
 
-        //todo https://medium.com/sears-israel/when-and-why-to-use-android-livedata-93d7dd949138
-        final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
+        final Observer<Movie> favoriteMovieObserver = new Observer<Movie>() {
             @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                if (movies != null) {
-                    if (movies.contains(movie)){
-                        mFavoritesButton.setImageResource(R.drawable.ic_favorite_black_24dp);
-                    }else {
-                        mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                    }
+            public void onChanged(@Nullable Movie movie) {
+                if (movie != null){
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+                } else {
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                 }
             }
         };
-        mFavoriteMoviesViewModel.getAllMovies().observe(this, movieListObserver);
+        favoriteMovieViewModel.getFavoriteMovie().observe(this, favoriteMovieObserver);
     }
 
 

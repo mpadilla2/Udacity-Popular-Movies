@@ -32,13 +32,8 @@ import retrofit2.Response;
 public class DataRepository {
 
     private FavoriteMoviesDAO favoriteMoviesDAO;
-    private LiveData<List<Movie>> mAllMovies;
-    private LiveData<Movie> mMovie;
-    private LiveData<List<Trailers>> mAllTrailers;
-    private LiveData<List<Reviews>> mAllReviews;
     private int movieCount;
-
-    ApiService mService;
+    private ApiService mService;
 
 
     public DataRepository(Application application){
@@ -49,8 +44,8 @@ public class DataRepository {
 
 
     // Query is run on a background thread because we're returning LiveData.
-    public LiveData<List<Movie>> getAllFavoriteMovies(){
-        mAllMovies = favoriteMoviesDAO.getAllMovies();
+    private LiveData<List<Movie>> getAllFavoriteMovies(){
+        LiveData<List<Movie>> mAllMovies = favoriteMoviesDAO.getAllMovies();
         Log.d("DATAREPOSITORY", "LOADED MOVIES FOR FAVORITES FROM DATABASE");
         return mAllMovies;
     }
@@ -58,12 +53,11 @@ public class DataRepository {
 
     // Query is run on a background thread because we're returning LiveData.
     public LiveData<Movie> getMovie(int movieId){
-        mMovie = favoriteMoviesDAO.getMovieById(movieId);
-        return mMovie;
+        return favoriteMoviesDAO.getMovieById(movieId);
     }
 
 
-    public void insert(Movie movie){
+    private void insert(Movie movie){
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -73,7 +67,7 @@ public class DataRepository {
     }
 
 
-    public void delete(Movie movie) {
+    private void delete(Movie movie) {
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {

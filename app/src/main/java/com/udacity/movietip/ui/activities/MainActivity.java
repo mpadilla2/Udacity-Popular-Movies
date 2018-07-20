@@ -27,34 +27,8 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     TODO scrolling_content use merges for landscape?
     TODO Bug: In landscape view trailers card is too large for screen
     TODO trailers view title is being cut off at the end instead of wrapping
-    TODO logic is wrong on setting favorite heart image. sometimes have to click multiple times to get it to change
     TODO Adhere to material design for margins, etc.
     TODO document references
-
-
-    COMPLETED ITEMS:
-    DONE Convert static viewmodels to viewmodel factory using category as param
-    DONE Convert in DetailActivity loadtrailers and loadreviews to viewmodel factory using movieid as param
-    DONE can't figure it out; Implement onsaveinstancestate for scrolled position
-    DONE Bug: on rotate in detailactivity trailers and reviews disappear AGAIN
-    DONE Implement onsaveinstancestate for detail activity
-    DONE not implementing due to time constraints: implement local broadcast receiver (in NetworkSe``rvice.java) for checking internet so fragments can do something with this info
-    DONE once data is downloaded and applied to adapter, refresh the views with the data available
-    DONE fragments are now using livedata and not duplicating views on rotate. However, there's one big bug:
-        On rotate, they are again querying for data instead of reusing the livedata.
-    DONE Bug: Although trailers and reviews load in portrait view, if I rotate, the trailers and reviews are gone. However, if I click back and then click a poster while in horizontal view the trailers and reviews DO show.
-    DONE Trailer recyclerview and Reviews recyclerview do NOT push up toolbar imageview in landscape
-    DONE can't figure out so moving on. schedule job to download the data only if network is available
-    DONE not implementing due to time constraints: implement paging. all fragments can use paging: if the user adds 200 favorites then it's going to need to pull in chunks of favorites and not the whole list at once. So when refactoring the only difference between the fragment objects is the datasource.
-    Best one fits my scenario. But need to refactor fragment first and separate api type fragment from db type fragment.
-    api type: has a: pagedlist recyclerview and adapter, tmdb datasource
-    db type: has a: regular recyclerview and adapter, db datasource
-    http://androidkt.com/rest-api-pagination-paging-library/
-    https://proandroiddev.com/8-steps-to-implement-paging-library-in-android-d02500f7fffe
-    https://github.com/codepath/android_guides/wiki/Paging-Library-Guide
-    http://codinginfinite.com/android-paging-library-example/
-    https://codelabs.developers.google.com/codelabs/android-paging/index.html#0
-
 
     REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
@@ -66,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     https://developer.android.com/guide/components/intents-common#PlayMedia
     https://developer.android.com/training/data-storage/sqlite
      */
-
 
 
     /*
