@@ -45,7 +45,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="16dp"
                     android:text="10.0"
-                    app:layout_constraintStart_toEndOf="@+id/textView"
+                    app:layout_constraintStart_toEndOf="@+id/detail_movie_vote_avg_label"
                     app:layout_constraintTop_toBottomOf="@+id/detail_movie_vote_count_textView" />
 
                 <TextView
@@ -65,8 +65,8 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:text="@string/detail_movie_release_date"
-                    app:layout_constraintStart_toEndOf="@id/movie_poster_imageView"
-                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+                    app:layout_constraintStart_toEndOf="@+id/movie_poster_imageView"
+                    app:layout_constraintTop_toBottomOf="@+id/detail_movie_vote_avg_label" />
 
                 <TextView
                     android:id="@+id/detail_movie_overview"

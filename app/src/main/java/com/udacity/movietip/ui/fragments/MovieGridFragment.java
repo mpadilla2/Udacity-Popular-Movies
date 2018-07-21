@@ -45,7 +45,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private MovieViewModel mMovieViewModel;
     RecyclerView mRecyclerView;
     private Parcelable mLayoutManagerstate;
-    private int mRecyclerViewId;
 
     // TODO restore scrolled position on rotate
     // The restore needs to happen AFTER data is loaded. So it has to occur in the loadmovies call, as well as
