@@ -10,8 +10,8 @@ import java.util.List;
 
 public class TrailersReviewsViewModel extends AndroidViewModel {
 
-    private LiveData<List<Trailers>> mTrailers;
-    private LiveData<List<Reviews>> mReviews;
+    private final LiveData<List<Trailers>> mTrailers;
+    private final LiveData<List<Reviews>> mReviews;
 
     TrailersReviewsViewModel(Application application, int id){
         super(application);

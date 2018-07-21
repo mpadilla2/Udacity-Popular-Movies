@@ -4,37 +4,17 @@ import android.os.Parcel;
 
 public class Reviews implements android.os.Parcelable {
 
-	private String author;
-	private String id;
-	private String content;
-	private String url;
-
-	public void setAuthor(String author){
-		this.author = author;
-	}
+	private final String author;
+	private final String id;
+	private final String content;
+	private final String url;
 
 	public String getAuthor(){
 		return author;
 	}
 
-	public void setId(String id){
-		this.id = id;
-	}
-
-	public String getId(){
-		return id;
-	}
-
-	public void setContent(String content){
-		this.content = content;
-	}
-
 	public String getContent(){
 		return content;
-	}
-
-	public void setUrl(String url){
-		this.url = url;
 	}
 
 	public String getUrl(){
@@ -56,10 +36,7 @@ public class Reviews implements android.os.Parcelable {
 		dest.writeString(this.url);
 	}
 
-	public Reviews() {
-	}
-
-	protected Reviews(Parcel in) {
+	private Reviews(Parcel in) {
 		this.author = in.readString();
 		this.id = in.readString();
 		this.content = in.readString();

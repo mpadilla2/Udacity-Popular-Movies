@@ -3,16 +3,13 @@ package com.udacity.movietip.data.model;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.provider.ContactsContract.Data;
 
 import com.udacity.movietip.data.db.DataRepository;
 
-import java.util.List;
-
 public class FavoriteMovieViewModel extends AndroidViewModel {
 
-    private DataRepository mRepository;
-    private LiveData<Movie> mMovie;
+    private final DataRepository mRepository;
+    private final LiveData<Movie> mMovie;
 
     FavoriteMovieViewModel(Application application, Movie movie){
         super(application);

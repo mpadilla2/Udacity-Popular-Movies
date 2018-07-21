@@ -3,7 +3,6 @@ package com.udacity.movietip.ui.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.MovieGridAdapter;
-import com.udacity.movietip.data.adapters.MovieGridAdapter.GridItemClickListener;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.MovieViewModelFactory;
@@ -43,7 +41,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
-    RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
     private Parcelable mLayoutManagerstate;
 
     // TODO restore scrolled position on rotate
@@ -148,7 +146,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         // If the network is available, make the tmdb api call with the appropriate category for the fragment
         if (isActiveNetwork()){
-            loadMovies(mCategory);
+            loadMovies();
             if (savedInstanceState != null){
                 mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
             }
@@ -242,7 +240,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Log.d("MOVIEGRIDFRAGMENT", "ONVIEWCREATED");
@@ -269,24 +267,16 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
     */
         final List<Movie> movieList = new ArrayList<>();
-        mAdapter = new MovieGridAdapter(getActivity(), movieList, new GridItemClickListener() {
-            @Override
-            public void onGridItemClick(int clickedItemIndex) {
-                Movie movie = movieList.get(clickedItemIndex);
-                mCallback.onImageSelected(movie);
-            }
+        mAdapter = new MovieGridAdapter(getActivity(), movieList, clickedItemIndex -> {
+            Movie movie = movieList.get(clickedItemIndex);
+            mCallback.onImageSelected(movie);
         });
     }
 
 
-    private void loadMovies(String category){
+    private void loadMovies(){
 
-        final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                mAdapter.setMoviesList(movies);
-            }
-        };
+        final Observer<List<Movie>> movieListObserver = mAdapter::setMoviesList;
 
         mMovieViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
     }
@@ -309,13 +299,4 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
 
-    /**
-     * Converting dp to pixel
-     * Reference: https://stackoverflow.com/questions/8309354/formula-px-to-dp-dp-to-px-android
-     */
-    private int dpToPx(int dp) {
-        //Resources r = getResources();
-        //return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
-        return (int)(dp * Resources.getSystem().getDisplayMetrics().density);
-    }
 }

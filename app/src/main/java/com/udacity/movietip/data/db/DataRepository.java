@@ -5,9 +5,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.udacity.movietip.R;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
 import com.udacity.movietip.data.model.Reviews;
@@ -18,8 +16,6 @@ import com.udacity.movietip.data.remote.ApiService;
 import com.udacity.movietip.data.utils.ApiUtils;
 import com.udacity.movietip.data.utils.AppExecutors;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,9 +27,9 @@ import retrofit2.Response;
 // Reference: https://developer.android.com/training/data-storage/room/accessing-data
 public class DataRepository {
 
-    private FavoriteMoviesDAO favoriteMoviesDAO;
+    private final FavoriteMoviesDAO favoriteMoviesDAO;
     private int movieCount;
-    private ApiService mService;
+    private final ApiService mService;
 
 
     public DataRepository(Application application){
@@ -58,37 +54,24 @@ public class DataRepository {
 
 
     private void insert(Movie movie){
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                favoriteMoviesDAO.insertMovie(movie);
-            }
-        });
+        AppExecutors.getInstance().diskIO().execute(() -> favoriteMoviesDAO.insertMovie(movie));
     }
 
 
     private void delete(Movie movie) {
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                favoriteMoviesDAO.deleteMovie(movie);
-            }
-        });
+        AppExecutors.getInstance().diskIO().execute(() -> favoriteMoviesDAO.deleteMovie(movie));
     }
 
 
     public void toggleFavorite(Movie movie){
 
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                movieCount = favoriteMoviesDAO.getMovieCount(movie.getId());
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            movieCount = favoriteMoviesDAO.getMovieCount(movie.getId());
 
-                if (movieCount > 0){
-                    delete(movie);
-                } else {
-                    insert(movie);
-                }
+            if (movieCount > 0){
+                delete(movie);
+            } else {
+                insert(movie);
             }
         });
     }

@@ -1,10 +1,8 @@
 package com.udacity.movietip.ui.activities;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomNavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
 
 import com.bumptech.glide.Glide;
 import com.udacity.movietip.R;
@@ -25,14 +22,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
 
     /*
     TODO detailactivity - on rotate scroll position jumps to the middle of the page
-    TODO scrolling_content use merges for landscape?
-    TODO Bug: In landscape view trailers card is too large for screen
-    TODO trailers view title is being cut off at the end instead of wrapping
-    TODO Adhere to material design for margins, etc.
-    TODO document references
 
-    DONE vote average is saying 10.0 for all movies
-    DONE favorites button background looks grey like it's picking up the constraint opacity instead of the white cardview
 
     REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
@@ -78,35 +68,32 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
         */
         navigationBottom = findViewById(R.id.navigation);
-        navigationBottom.setOnNavigationItemSelectedListener(new OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        navigationBottom.setOnNavigationItemSelectedListener(item -> {
 
-                switch (item.getItemId()) {
-                    case R.id.navigation_popular:
-                        toolBar.setTitle(R.string.title_popular);
-                        // Provide argument to fragment constructor to build fragment and call correct api path
-                        // Reference: https://developer.android.com/reference/android/app/Fragment
-                        fragmentTag = MOVIES_POPULAR;
-                        break;
-                    case R.id.navigation_top_rated:
-                        toolBar.setTitle(R.string.title_top_rated);
-                        fragmentTag = MOVIES_TOP_RATED;
-                        break;
-                    case R.id.navigation_now_playing:
-                        toolBar.setTitle(R.string.title_now_playing);
-                        fragmentTag = MOVIES_NOW_PLAYING;
-                        break;
-                    case R.id.navigation_favorites:
-                        toolBar.setTitle(R.string.title_favorites);
-                        fragmentTag = MOVIES_FAVORITES;
-                        break;
-                }
-
-                initFragment(fragmentTag);
-
-                return true;
+            switch (item.getItemId()) {
+                case R.id.navigation_popular:
+                    toolBar.setTitle(R.string.title_popular);
+                    // Provide argument to fragment constructor to build fragment and call correct api path
+                    // Reference: https://developer.android.com/reference/android/app/Fragment
+                    fragmentTag = MOVIES_POPULAR;
+                    break;
+                case R.id.navigation_top_rated:
+                    toolBar.setTitle(R.string.title_top_rated);
+                    fragmentTag = MOVIES_TOP_RATED;
+                    break;
+                case R.id.navigation_now_playing:
+                    toolBar.setTitle(R.string.title_now_playing);
+                    fragmentTag = MOVIES_NOW_PLAYING;
+                    break;
+                case R.id.navigation_favorites:
+                    toolBar.setTitle(R.string.title_favorites);
+                    fragmentTag = MOVIES_FAVORITES;
+                    break;
             }
+
+            initFragment();
+
+            return true;
         });
 
         if (savedInstanceState == null) {
@@ -136,13 +123,10 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
          * Reference: https://developer.android.com/reference/android/support/design/widget/AppBarLayout.OnOffsetChangedListener
          */
         ((AppBarLayout)findViewById(R.id.app_bar_layout))
-                .addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                // move Bottom navigation view in the opposite direction of the appbar on the y axis.
-                navigationBottom.setTranslationY(verticalOffset*-1);
-            }
-        });
+                .addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
+                    // move Bottom navigation view in the opposite direction of the appbar on the y axis.
+                    navigationBottom.setTranslationY(verticalOffset*-1);
+                });
     }
 
 
@@ -151,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
        Hence, I will not add the fragments to back stack.
        Reference: https://material.io/design/components/bottom-navigation.html#behavior
     */
-    private void initFragment(String tag) {
+    private void initFragment() {
         // Per Material Design transition between bottom navigation views using cross-fade animation
         // Reference: https://material.io/design/components/bottom-navigation.html#behavior
         int fadeIn = android.R.anim.fade_in;

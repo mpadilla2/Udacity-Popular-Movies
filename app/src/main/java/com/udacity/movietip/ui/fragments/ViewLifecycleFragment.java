@@ -41,12 +41,12 @@ public class ViewLifecycleFragment extends Fragment {
      * or null if there is no current view hierarchy.
      */
     @Nullable
-    public LifecycleOwner getViewLifecycleOwner() {
+    LifecycleOwner getViewLifecycleOwner() {
         return viewLifecycleOwner;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewLifecycleOwner = new ViewLifecycleOwner();
         viewLifecycleOwner.getLifecycle().handleLifecycleEvent(Event.ON_CREATE);

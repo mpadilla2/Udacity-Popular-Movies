@@ -2,14 +2,11 @@ package com.udacity.movietip.data.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,8 +27,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
     // Reference: https://www.codeproject.com/Tips/1229751/Handle-Click-Events-of-Multiple-Buttons-Inside-a
     public interface ItemClickListener {
-        void trailerOnClick(View v, int clickedItemIndex);
-        void shareOnClick(View v, int clickedItemIndex);
+        void trailerOnClick(int clickedItemIndex);
+        void shareOnClick(int clickedItemIndex);
     }
 
     // Provide a reference to the views for each trailer item
@@ -47,19 +44,9 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
             shareImageButton = view.findViewById(R.id.movie_trailer_share_button);
             trailerImageView = view.findViewById(R.id.movie_trailer_imageView);
 
-            trailerImageView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnClickListener.trailerOnClick(v, getAdapterPosition());
-                }
-            });
+            trailerImageView.setOnClickListener(v -> mOnClickListener.trailerOnClick(getAdapterPosition()));
 
-            shareImageButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnClickListener.shareOnClick(v, getAdapterPosition());
-                }
-            });
+            shareImageButton.setOnClickListener(v -> mOnClickListener.shareOnClick(getAdapterPosition()));
         }
     }
 
@@ -78,11 +65,11 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
 
         // dynamically calculate and set the width of the view
         // Reference: https://stackoverflow.com/a/50498245
-/*        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
         Integer width = displayMetrics.widthPixels;
         int calculatedWidth = (int) Math.round(width/1.2);
 
-        view.setLayoutParams(new RecyclerView.LayoutParams(calculatedWidth, RecyclerView.LayoutParams.WRAP_CONTENT));*/
+        view.setLayoutParams(new RecyclerView.LayoutParams(calculatedWidth, RecyclerView.LayoutParams.WRAP_CONTENT));
 
         return new TrailerViewHolder(view);
     }
@@ -91,8 +78,8 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     @Override
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, int position) {
 
-        String trailerUrl = "";
-        String trailerName = "";
+        String trailerUrl;
+        String trailerName;
 
         trailerName = mTrailersList.get(position).getName();
         holder.trailerTextView.setText(trailerName);

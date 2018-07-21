@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -50,7 +49,7 @@ public class DetailActivity
     private static final int IMAGE_LOADING = R.drawable.ic_image_loading;
     private static final int BROKEN_IMAGE = R.drawable.ic_broken_image;
 
-    private Context mContext;
+    private final Context mContext;
     private TrailersAdapter mTrailersAdapter;
     private ReviewsAdapter mReviewsAdapter;
 
@@ -130,28 +129,22 @@ public class DetailActivity
         TrailersReviewsViewModel mTrailersReviewsViewModel = ViewModelProviders
                 .of(this, trailersReviewsViewModelFactory).get(TrailersReviewsViewModel.class);
 
-        final Observer<List<Trailers>> trailersListObserver = new Observer<List<Trailers>>() {
-            @Override
-            public void onChanged(@Nullable List<Trailers> trailersList) {
-                if (trailersList != null) {
-                    mTrailersAdapter.setTrailersList(trailersList);
-                    mTrailersRecyclerView.setAdapter(mTrailersAdapter);
-                } else {
-                    mTrailersRecyclerView.setVisibility(View.GONE);
-                }
+        final Observer<List<Trailers>> trailersListObserver = trailersList -> {
+            if (trailersList != null) {
+                mTrailersAdapter.setTrailersList(trailersList);
+                mTrailersRecyclerView.setAdapter(mTrailersAdapter);
+            } else {
+                mTrailersRecyclerView.setVisibility(View.GONE);
             }
         };
 
-        final Observer<List<Reviews>> reviewsListObserver = new Observer<List<Reviews>>() {
-            @Override
-            public void onChanged(@Nullable List<Reviews> reviews) {
-                if (reviews != null){
-                    mReviewsAdapter.setReviewsList(reviews);
-                    mReviewsRecyclerView.setAdapter(mReviewsAdapter);
-                } else {
-                    mReviewsRecyclerView.setVisibility(View.GONE);
-                }            }
-        };
+        final Observer<List<Reviews>> reviewsListObserver = reviews -> {
+            if (reviews != null){
+                mReviewsAdapter.setReviewsList(reviews);
+                mReviewsRecyclerView.setAdapter(mReviewsAdapter);
+            } else {
+                mReviewsRecyclerView.setVisibility(View.GONE);
+            }            };
 
         mTrailersReviewsViewModel.getAllTrailers().observe(this, trailersListObserver);
         mTrailersReviewsViewModel.getAllReviews().observe(this, reviewsListObserver);
@@ -160,12 +153,7 @@ public class DetailActivity
 
 
     private void setUpFavoritesButton() {
-        mFavoritesButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                favoriteMovieViewModel.toggleFavorite(movie);
-            }
-        });
+        mFavoritesButton.setOnClickListener(v -> favoriteMovieViewModel.toggleFavorite(movie));
     }
 
 
@@ -176,14 +164,11 @@ public class DetailActivity
         favoriteMovieViewModel =
                 ViewModelProviders.of(this, favoriteMovieViewModelFactory).get(FavoriteMovieViewModel.class);
 
-        final Observer<Movie> favoriteMovieObserver = new Observer<Movie>() {
-            @Override
-            public void onChanged(@Nullable Movie movie) {
-                if (movie != null){
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_red_24dp);
-                } else {
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_red_24dp);
-                }
+        final Observer<Movie> favoriteMovieObserver = movie -> {
+            if (movie != null){
+                mFavoritesButton.setImageResource(R.drawable.ic_favorite_red_24dp);
+            } else {
+                mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_red_24dp);
             }
         };
         favoriteMovieViewModel.getFavoriteMovie().observe(this, favoriteMovieObserver);
@@ -204,7 +189,7 @@ public class DetailActivity
         // Reference: https://www.codeproject.com/Tips/1229751/Handle-Click-Events-of-Multiple-Buttons-Inside-a
         mTrailersAdapter = new TrailersAdapter(this, trailersList, new TrailersAdapter.ItemClickListener() {
             @Override
-            public void trailerOnClick(View v, int clickedItemIndex) {
+            public void trailerOnClick(int clickedItemIndex) {
                 // grab the clicked trailer
                 Trailers trailer = trailersList.get(clickedItemIndex);
 
@@ -221,7 +206,7 @@ public class DetailActivity
             }
 
             @Override
-            public void shareOnClick(View v, int clickedItemIndex) {
+            public void shareOnClick(int clickedItemIndex) {
                 // create share intent
                 Trailers trailer = trailersList.get(clickedItemIndex);
 
@@ -240,20 +225,17 @@ public class DetailActivity
         });
 
         final List<Reviews> reviewsList = new ArrayList<>();
-        mReviewsAdapter = new ReviewsAdapter(this, reviewsList, new ReviewsAdapter.ItemClickListener() {
-            @Override
-            public void onItemClick(int clickedItemIndex) {
-                // grab the clicked review
-                Reviews review = reviewsList.get(clickedItemIndex);
+        mReviewsAdapter = new ReviewsAdapter(this, reviewsList, clickedItemIndex -> {
+            // grab the clicked review
+            Reviews review = reviewsList.get(clickedItemIndex);
 
-                Intent reviewIntent = new Intent(Intent.ACTION_VIEW);
-                reviewIntent.setData(Uri.parse(review.getUrl()));
+            Intent reviewIntent = new Intent(Intent.ACTION_VIEW);
+            reviewIntent.setData(Uri.parse(review.getUrl()));
 
-                Intent chooser = Intent.createChooser(reviewIntent, "Choose Browser");
+            Intent chooser = Intent.createChooser(reviewIntent, "Choose Browser");
 
-                if (reviewIntent.resolveActivity(getPackageManager()) != null){
-                    startActivity(chooser);
-                }
+            if (reviewIntent.resolveActivity(getPackageManager()) != null){
+                startActivity(chooser);
             }
         });
     }

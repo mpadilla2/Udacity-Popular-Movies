@@ -7,16 +7,11 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.ReviewsAdapter.ReviewViewHolder;
 import com.udacity.movietip.data.model.Reviews;
-import com.udacity.movietip.data.model.Trailers;
 
 import java.util.List;
 

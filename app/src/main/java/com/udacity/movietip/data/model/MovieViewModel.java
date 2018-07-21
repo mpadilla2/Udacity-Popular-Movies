@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MovieViewModel extends AndroidViewModel {
 
-    private LiveData<List<Movie>> mAllMovies;
+    private final LiveData<List<Movie>> mAllMovies;
 
     MovieViewModel(Application application, String category){
         super(application);

@@ -74,7 +74,4 @@ dependencies {
     // Lifecycle components - ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
     annotationProcessor "android.arch.lifecycle:compiler:$rootProject.archLifecycleVersion"
-
-    // Paging
-    implementation "android.arch.paging:runtime:$rootProject.pagingVersion"
 }

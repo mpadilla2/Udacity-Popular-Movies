@@ -44,10 +44,6 @@ public class Movie implements Parcelable {
         this.voteAverage = voteAverage;
     }
 
-    public void setPosterPath(String posterPath){
-        this.posterPath = posterPath;
-    }
-
     public String getPosterPath(){
         return posterPath;
     }
@@ -56,40 +52,20 @@ public class Movie implements Parcelable {
         return IMAGE_BASE_URL + POSTER_SIZE + posterPath;
     }
 
-    public void setOverview(String overview){
-        this.overview = overview;
-    }
-
     public String getOverview() {
         return overview;
-    }
-
-    public void setReleaseDate(String releaseDate){
-        this.releaseDate = releaseDate;
     }
 
     public String getReleaseDate() {
         return releaseDate;
     }
 
-    public void setId(int id){
-        this.id = id;
-    }
-
     public int getId() {
         return id;
     }
 
-    public void setTitle(String title){
-        this.title = title;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setBackdropPath(String backdropPath){
-        this.backdropPath = backdropPath;
     }
 
     public String getBackdropPath() {
@@ -100,24 +76,12 @@ public class Movie implements Parcelable {
         return IMAGE_BASE_URL + BACKDROP_SIZE + backdropPath;
     }
 
-    public void setPopularity(double popularity){
-        this.popularity = popularity;
-    }
-
     public double getPopularity() {
         return popularity;
     }
 
-    public void setVoteCount(int voteCount){
-        this.voteCount = voteCount;
-    }
-
     public int getVoteCount() {
         return voteCount;
-    }
-
-    public void setVoteAverage(float voteAverage){
-        this.voteAverage = voteAverage;
     }
 
     public float getVoteAverage() {
@@ -154,8 +118,8 @@ public class Movie implements Parcelable {
         this.popularity = (double) in.readSerializable();
         this.voteCount = (int) in.readValue(int.class.getClassLoader());
         this.voteAverage = (float) in.readSerializable();
-        String posterUrl = in.readString();
-        String backdropUrl = in.readString();
+/*        String posterUrl = in.readString();
+        String backdropUrl = in.readString();*/
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 
 public class MovieViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private Application mApplication;
-    private String mCategory;
+    private final Application mApplication;
+    private final String mCategory;
 
     public MovieViewModelFactory(Application application, String category){
         mApplication = application;

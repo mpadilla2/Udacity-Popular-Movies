@@ -1,7 +1,6 @@
 package com.udacity.movietip.data.db;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -11,9 +10,7 @@ import android.arch.persistence.room.Update;
 
 import com.udacity.movietip.data.model.Movie;
 
-import java.util.ArrayList;
 import java.util.List;
-
 
 /*
   Reference: https://codelabs.developers.google.com/codelabs/android-room-with-a-view/#0

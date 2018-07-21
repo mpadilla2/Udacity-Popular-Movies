@@ -7,7 +7,6 @@
     <string name="title_now_playing">Now Playing</string>
     <string name="title_favorites">Favorites</string>
 
-    <string name="internet_status">"No internet connection!"</string>
     <string name="detail_movie_date">10/15/2018</string>
     <string name="detail_movie_release_date">Released</string>
     <string name="detail_movie_overview_text">Overview Text</string>
@@ -17,5 +16,8 @@
     <string name="detail_movie_poster">movie poster</string>
     <string name="detail_movie_review">Movie Review</string>
     <string name="movie_trailer_imageView">Movie Trailer</string>
+    <string name="movie_detail_vote_average">10.0</string>
+    <string name="movie_detail_vote_average_label">Vote Average</string>
+    <string name="movie_trailer_share_button">Trailer Share Button</string>
 
 </resources>

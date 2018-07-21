@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 
 public class FavoriteMovieViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private Application mApplication;
-    private Movie mMovie;
+    private final Application mApplication;
+    private final Movie mMovie;
 
     public FavoriteMovieViewModelFactory(Application application, Movie movie){
         mApplication = application;
