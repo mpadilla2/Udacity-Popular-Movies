@@ -60,6 +60,7 @@ public class DetailActivity
     private TextView mReleaseDateTextView;
     private TextView mOverViewTextView;
     private TextView mVoteCountTextview;
+    private TextView mVoteAvgTextview;
     private android.support.v7.widget.Toolbar mToolbar;
     private ImageButton mFavoritesButton;
     private RecyclerView mTrailersRecyclerView;
@@ -179,9 +180,9 @@ public class DetailActivity
             @Override
             public void onChanged(@Nullable Movie movie) {
                 if (movie != null){
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_black_24dp);
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_red_24dp);
                 } else {
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border_red_24dp);
                 }
             }
         };
@@ -266,6 +267,7 @@ public class DetailActivity
         mReleaseDateTextView = findViewById(R.id.detail_movie_release_date);
         mOverViewTextView = findViewById(R.id.detail_movie_overview);
         mVoteCountTextview = findViewById(R.id.detail_movie_vote_count_textView);
+        mVoteAvgTextview = findViewById(R.id.movie_detail_vote_average);
         mToolbar = findViewById(R.id.toolbar);
         mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
         mReviewsRecyclerView = findViewById(R.id.detail_movie_reviews_recyclerview);
@@ -286,6 +288,7 @@ public class DetailActivity
         mReleaseDateTextView.setText(movie.getReleaseDate());
         mOverViewTextView.setText(movie.getOverview());
         mVoteCountTextview.setText(String.valueOf(movie.getVoteCount()));
+        mVoteAvgTextview.setText(String.valueOf(movie.getVoteAverage()));
 
         // Reference: https://developer.android.com/guide/topics/resources/runtime-changes
         if(isLandscape) {

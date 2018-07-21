@@ -9,7 +9,7 @@
 
     <string name="internet_status">"No internet connection!"</string>
     <string name="detail_movie_date">10/15/2018</string>
-    <string name="detail_movie_release_date">Release Date</string>
+    <string name="detail_movie_release_date">Released</string>
     <string name="detail_movie_overview_text">Overview Text</string>
     <string name="detail_movie_votes">Votes</string>
     <string name="detail_movie_vote_count">12345</string>

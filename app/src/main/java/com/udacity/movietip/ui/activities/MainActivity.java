@@ -24,11 +24,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
 
     /*
+    TODO detailactivity - on rotate scroll position jumps to the middle of the page
+    TODO favorites button background looks grey like it's picking up the constraint opacity instead of the white cardview
     TODO scrolling_content use merges for landscape?
     TODO Bug: In landscape view trailers card is too large for screen
     TODO trailers view title is being cut off at the end instead of wrapping
     TODO Adhere to material design for margins, etc.
     TODO document references
+
+    DONE vote average is saying 10.0 for all movies
 
     REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
     private FragmentManager fragmentManager;
     private BottomNavigationView navigationBottom;
     private Toolbar toolBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -36,12 +37,20 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR = "popular";
     private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
+    private static final String SAVED_LAYOUT_MANAGER_STATE = "Layout Manager State Key";
 
     private Context mContext;
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
+    RecyclerView mRecyclerView;
+    private Parcelable mLayoutManagerstate;
+    private int mRecyclerViewId;
 
+    // TODO restore scrolled position on rotate
+    // The restore needs to happen AFTER data is loaded. So it has to occur in the loadmovies call, as well as
+    // onViewStateRestored - check that this occurs after data is loaded
+    // https://stackoverflow.com/a/29166336
 
     /* Create a new instance of MovieGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment
@@ -73,6 +82,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
             throw new ClassCastException(context.toString()
                     + " must implement OnImageClickListener");
         }
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONATTACH");
     }
 
 
@@ -80,6 +91,9 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initAdapter();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONCREATE");
+
     }
 
 
@@ -87,15 +101,26 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        Log.d("MOVIEGRIDFRAGMENT", "ONCREATEVIEW");
+
+
         // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_master_grid, container, false);
-        RecyclerView mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
+        mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
+
         mRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setSaveEnabled(true);
 
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
+
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        if (savedInstanceState != null){
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
+        }
+
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
@@ -105,6 +130,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONACTIVITYCREATED");
 
         // savedInstanceState check for previous category instance
         if (savedInstanceState != null){
@@ -123,6 +150,9 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         // If the network is available, make the tmdb api call with the appropriate category for the fragment
         if (isActiveNetwork()){
             loadMovies(mCategory);
+            if (savedInstanceState != null){
+                mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
+            }
         } else {
             Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
         }
@@ -150,7 +180,88 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONSAVEINSTANCESTATE");
+
+        mLayoutManagerstate = mRecyclerView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(SAVED_LAYOUT_MANAGER_STATE, mLayoutManagerstate);
         outState.putString(SAVED_FRAGMENT_CATEGORY, mCategory);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("MOVIEGRIDFRAGMENT", "ONSTART");
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONSTOP");
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONRESUME");
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONPAUSE");
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONDESTROYVIEW");
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("MOVIEGRIDFRAGMENT", "ONDESTROY");
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONDETACH");
+
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONVIEWCREATED");
+
+    }
+
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        Log.d("MOVIEGRIDFRAGMENT", "ONVIEWSTATERESTORED");
+
+
+        if (savedInstanceState != null){
+            mLayoutManagerstate = savedInstanceState.getParcelable(SAVED_LAYOUT_MANAGER_STATE);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
+        }
     }
 
 
