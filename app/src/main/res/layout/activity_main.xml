@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -27,18 +28,11 @@
 
 
         <!-- Middle Section displays RecyclerView with scrolling movie posters -->
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/fragment_container_scrollview"
+        <FrameLayout
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="centerInside"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:fillViewport="true">
-            <FrameLayout
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </android.support.v4.widget.NestedScrollView>
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
 
         <!-- Bottom navigation for popular, top rated, and now playing (coming soon...favorites) -->

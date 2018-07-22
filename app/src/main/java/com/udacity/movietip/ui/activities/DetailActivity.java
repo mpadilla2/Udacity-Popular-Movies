@@ -286,7 +286,7 @@ public class DetailActivity
 
     private void setConstraintBackground(String imageUrl) {
 
-        final ConstraintLayout scrollingConstraint = findViewById(R.id.scrolling_constraint);
+        final ConstraintLayout scrollingConstraint = findViewById(R.id.detail_scrolling_constraint);
 
         // Reference: https://github.com/bumptech/glide/wiki
         Glide.with(this)

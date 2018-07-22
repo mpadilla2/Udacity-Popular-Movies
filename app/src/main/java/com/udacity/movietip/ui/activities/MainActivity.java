@@ -21,9 +21,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
 
     /*
-    TODO detailactivity - on rotate scroll position jumps to the middle of the page
-
-
     REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
     https://developer.android.com/guide/components/fragments

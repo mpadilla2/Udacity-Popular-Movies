@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
+    android:id="@+id/detail_coordinator_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,6 +10,7 @@
 
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/detail_app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -52,6 +54,7 @@
      Otherwise we see a large white space on the bottom of the constraintlayout content.
      https://developer.android.com/reference/android/support/v4/widget/NestedScrollView -->
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/detail_nested_scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
