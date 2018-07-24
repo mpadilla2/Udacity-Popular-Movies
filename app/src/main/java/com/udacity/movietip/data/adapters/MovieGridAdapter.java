@@ -72,7 +72,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
            Reference: ic_image_loading icon made by https://www.flaticon.com/authors/dave-gandy and is licensed by http://creativecommons.org/licenses/by/3.0/
          */
 
-        final Movie movieItem = mMoviesList.get(position);
+        final Movie movieItem = mMoviesList.get(holder.getAdapterPosition());
 
         Glide.with(mContext)
                 .load(movieItem.getPosterUrl())
@@ -90,11 +90,11 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
     // Reference: https://stackoverflow.com/a/48959184
     public void setMoviesList(List<Movie> moviesList){
-        // clear the old list
         mMoviesList.clear();
-        // collection.addAll in place of foreach or for loop
         mMoviesList.addAll(moviesList);
-        // notify the adapter
-        notifyDataSetChanged();
+        // notify the adapter that the dataset has changed
+        notifyItemRangeChanged(0, getItemCount());
     }
+
+
 }

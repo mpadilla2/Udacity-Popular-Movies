@@ -9,11 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
-/*
- * This workaround is needed to address the bug referenced below.
- * Android api 28 is supposed to include this, however it's in alpha right now and will not meet the Udacity rubric as stable.
- */
-
 /**
  * Fragment providing separate lifecycle owners for each created view hierarchy.
  * <p>
@@ -41,7 +36,7 @@ public class ViewLifecycleFragment extends Fragment {
      * or null if there is no current view hierarchy.
      */
     @Nullable
-    LifecycleOwner getViewLifecycleOwner() {
+    public LifecycleOwner getViewLifecycleOwner() {
         return viewLifecycleOwner;
     }
 
