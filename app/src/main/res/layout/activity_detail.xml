@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
+            android:id="@+id/detail_activity_collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -38,7 +38,7 @@
                 app:layout_scrollFlags="scroll" />
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
+                android:id="@+id/detail_activity_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:minHeight="?attr/actionBarSize"

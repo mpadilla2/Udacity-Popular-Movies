@@ -3,7 +3,6 @@ package com.udacity.movietip.ui.fragments;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.MovieGridAdapter;
-import com.udacity.movietip.data.adapters.MovieGridAdapter.GridItemClickListener;
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MovieViewModel;
 import com.udacity.movietip.data.model.MovieViewModelFactory;
@@ -37,19 +35,12 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR = "popular";
     private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
-    private static final String SAVED_LAYOUT_MANAGER_STATE = "Layout Manager State Key";
 
     private Context mContext;
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
     RecyclerView mRecyclerView;
-    private Parcelable mLayoutManagerstate;
-
-    // TODO restore scrolled position on rotate
-    // The restore needs to happen AFTER data is loaded. So it has to occur in the loadmovies call, as well as
-    // onViewStateRestored - check that this occurs after data is loaded
-    // https://stackoverflow.com/a/29166336
 
     /* Create a new instance of MovieGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment
@@ -89,10 +80,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initAdapter();
-
         Log.d("MOVIEGRIDFRAGMENT", "ONCREATE");
-
+        initAdapter();
     }
 
 
@@ -102,44 +91,20 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         Log.d("MOVIEGRIDFRAGMENT", "ONCREATEVIEW");
 
-
         // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
 
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setSaveEnabled(true);
-
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
 
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        if (savedInstanceState != null){
-            mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
-        }
-
-        mRecyclerView.setAdapter(mAdapter);
-
-        return rootView;
-    }
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONACTIVITYCREATED");
+        GridLayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
 
         // savedInstanceState check for previous category instance
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(SAVED_FRAGMENT_CATEGORY)){
                 mCategory = savedInstanceState.getString(SAVED_FRAGMENT_CATEGORY);
                 Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY EXISTS AS " + mCategory);
-            }
-            if (savedInstanceState.containsKey(SAVED_LAYOUT_MANAGER_STATE)){
-                mLayoutManagerstate = savedInstanceState.getParcelable(SAVED_LAYOUT_MANAGER_STATE);
             }
         } else {
             // getArguments category for initial Fragment creation
@@ -151,11 +116,23 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         // If the network is available, make the tmdb api call with the appropriate category for the fragment
         if (isActiveNetwork()){
-            loadMovies(mCategory);
+            loadMovies();
         } else {
             Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
         }
 
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+
+        return rootView;
+    }
+
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d("MOVIEGRIDFRAGMENT", "ONACTIVITYCREATED");
     }
 
 
@@ -181,9 +158,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         super.onSaveInstanceState(outState);
 
         Log.d("MOVIEGRIDFRAGMENT", "ONSAVEINSTANCESTATE");
-
-        mLayoutManagerstate = mRecyclerView.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(SAVED_LAYOUT_MANAGER_STATE, mLayoutManagerstate);
         outState.putString(SAVED_FRAGMENT_CATEGORY, mCategory);
     }
 
@@ -192,29 +166,25 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     /* Instantiate custom MovieGridAdapter and custom click listener
         Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
     */
-        final List<Movie> movieList = new ArrayList<>();
-        mAdapter = new MovieGridAdapter(getActivity(), movieList, new GridItemClickListener() {
-            @Override
-            public void onGridItemClick(int clickedItemIndex) {
-                Movie movie = movieList.get(clickedItemIndex);
-                mCallback.onImageSelected(movie);
-            }
+        List<Movie> movieList = new ArrayList<>();
+        mAdapter = new MovieGridAdapter(getActivity(), movieList, clickedItemIndex -> {
+            Movie movie = movieList.get(clickedItemIndex);
+            mCallback.onImageSelected(movie);
         });
     }
 
 
-    private void loadMovies(String category){
+    private void loadMovies(){
 
         final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 mAdapter.setMoviesList(movies);
                 mRecyclerView.setAdapter(mAdapter);
-                if (mLayoutManagerstate != null) mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerstate);
             }
         };
 
-        mMovieViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
+        mMovieViewModel.getAllMovies().observe(this, movieListObserver);
     }
 
 
@@ -235,65 +205,4 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.d("MOVIEGRIDFRAGMENT", "ONSTART");
-
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONSTOP");
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONRESUME");
-
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONPAUSE");
-
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONDESTROYVIEW");
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d("MOVIEGRIDFRAGMENT", "ONDESTROY");
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONDETACH");
-
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONVIEWCREATED");
-
-    }
 }

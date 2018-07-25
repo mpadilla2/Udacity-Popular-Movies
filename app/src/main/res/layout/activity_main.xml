@@ -10,12 +10,12 @@
 
         <!-- Top Toolbar -->
         <android.support.design.widget.AppBarLayout
-            android:id="@+id/app_bar_layout"
+            android:id="@+id/main_activity_app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
                 <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
+                    android:id="@+id/main_activity_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="@color/colorPrimary"
@@ -29,7 +29,8 @@
 
         <!-- Middle Section displays RecyclerView with scrolling movie posters -->
         <FrameLayout
-            android:id="@+id/fragment_container"
+            android:id="@+id/main_activity_fragment_container"
+            android:name="FragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
@@ -37,7 +38,7 @@
 
         <!-- Bottom navigation for popular, top rated, and now playing (coming soon...favorites) -->
         <android.support.design.widget.BottomNavigationView
-            android:id="@+id/navigation"
+            android:id="@+id/main_activity_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

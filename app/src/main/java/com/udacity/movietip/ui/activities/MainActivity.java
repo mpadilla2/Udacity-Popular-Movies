@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
 
         setContentView(R.layout.activity_main);
 
-        toolBar = findViewById(R.id.toolbar);
+        toolBar = findViewById(R.id.main_activity_toolbar);
 
         // For testing glide when network is down
         Glide.get(this).clearMemory();
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
         */
-        navigationBottom = findViewById(R.id.navigation);
+        navigationBottom = findViewById(R.id.main_activity_navigation);
         navigationBottom.setOnNavigationItemSelectedListener(item -> {
 
             switch (item.getItemId()) {
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
          * Show/hide BottomNavigationView - this "seems" a more elegant solution than overriding coordinatorlayout behavior. Maybe that's premature or naive at this point?
          * Reference: https://developer.android.com/reference/android/support/design/widget/AppBarLayout.OnOffsetChangedListener
          */
-        ((AppBarLayout)findViewById(R.id.app_bar_layout))
+        ((AppBarLayout)findViewById(R.id.main_activity_app_bar_layout))
                 .addOnOffsetChangedListener((appBarLayout, verticalOffset) -> {
                     // move Bottom navigation view in the opposite direction of the appbar on the y axis.
                     navigationBottom.setTranslationY(verticalOffset*-1);
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             fragmentTransaction.show(taggedFragment);
         } else {
             taggedFragment = new MovieGridFragment().newInstance(fragmentTag);
-            fragmentTransaction.add(R.id.fragment_container, taggedFragment, fragmentTag);
+            fragmentTransaction.add(R.id.main_activity_fragment_container, taggedFragment, fragmentTag);
             Log.d("MainActivity", "created the " + taggedFragment + " fragment");
         }
 

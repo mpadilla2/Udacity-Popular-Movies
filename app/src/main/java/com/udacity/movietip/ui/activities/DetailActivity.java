@@ -144,7 +144,8 @@ public class DetailActivity
                 mReviewsRecyclerView.setAdapter(mReviewsAdapter);
             } else {
                 mReviewsRecyclerView.setVisibility(View.GONE);
-            }            };
+            }
+        };
 
         mTrailersReviewsViewModel.getAllTrailers().observe(this, trailersListObserver);
         mTrailersReviewsViewModel.getAllReviews().observe(this, reviewsListObserver);
@@ -245,12 +246,12 @@ public class DetailActivity
 
         mPosterImageView = findViewById(R.id.movie_poster_imageView);
         mBackdropImageView = findViewById(R.id.detail_movie_backdrop_imageView);
-        mCollapsingToolbar = findViewById(R.id.collapsing_toolbar);
+        mCollapsingToolbar = findViewById(R.id.detail_activity_collapsing_toolbar);
         mReleaseDateTextView = findViewById(R.id.detail_movie_release_date);
         mOverViewTextView = findViewById(R.id.detail_movie_overview);
         mVoteCountTextview = findViewById(R.id.detail_movie_vote_count_textView);
         mVoteAvgTextview = findViewById(R.id.movie_detail_vote_average);
-        mToolbar = findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.detail_activity_toolbar);
         mTrailersRecyclerView = findViewById(R.id.detail_movie_trailers_recyclerview);
         mReviewsRecyclerView = findViewById(R.id.detail_movie_reviews_recyclerview);
         mFavoritesButton = findViewById(R.id.detail_movie_favorites_button);
