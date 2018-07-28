@@ -5,7 +5,6 @@
     android:id="@+id/main_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".ui.activities.MainActivity">
 
         <!-- Top Toolbar -->
@@ -52,5 +51,9 @@
             app:itemTextColor="@color/white"
             app:menu="@menu/navigation"/>
 
-
 </android.support.design.widget.CoordinatorLayout>
+<!-- tried:
+     android:descendantFocusability="blocksDescendants" in main coordinatorlayout and in framelayout that contains fragment_movie_grid. it did not work to allow scroll state to restore automatically.-->
+
+<!-- coordinatorlayout -       android:fitsSystemWindows="true"
+                   -->

@@ -33,13 +33,14 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR = "popular";
-    private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
     private static final String PASSED_IN_CATEGORY = "category";
 
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
     RecyclerView mRecyclerView;
+    List<Movie> movieList = new ArrayList<>();
+
 
     public MovieGridFragment() {
         // Required empty public constructor
@@ -61,7 +62,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("MOVIEGRIDFRAGMENT", "ONCREATE");
-        initAdapter();
     }
 
 
@@ -71,25 +71,31 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         Log.d("MOVIEGRIDFRAGMENT", "ONCREATEVIEW");
 
+        mCategory = getArguments() != null ? getArguments().getString(PASSED_IN_CATEGORY) : MOVIES_POPULAR;
+
         final View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
 
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(), RECYCLERVIEW_NUM_COLUMNS);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
+        mRecyclerView.setHasFixedSize(true);
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), RECYCLERVIEW_NUM_COLUMNS);
+        mAdapter = new MovieGridAdapter(movieList);
+        mRecyclerView.setAdapter(mAdapter);
 
-        if (savedInstanceState != null){
-            if (savedInstanceState.containsKey(SAVED_FRAGMENT_CATEGORY)){
-                mCategory = savedInstanceState.getString(SAVED_FRAGMENT_CATEGORY);
-                Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY EXISTS AS " + mCategory);
-            }
-        } else {
-            // getArguments category for initial Fragment creation
-            mCategory = getArguments() != null ? getArguments().getString("category") : MOVIES_POPULAR;
-            Log.d("MOVIEGRIDFRAGMENT", "A SAVED INSTANCE OF CATEGORY DOESN'T EXIST! CREATING NEW " + mCategory);
-        }
+        return rootView;
+    }
 
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // ViewLifeCycleFragment bug requires this in onActivityCreated
+        // Reference: https://medium.com/@BladeCoder/architecture-components-pitfalls-part-1-9300dd969808
         setUpViewModel();
 
         if (isActiveNetwork()){
@@ -97,19 +103,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         } else {
             Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
         }
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
-
-        return rootView;
-    }
-
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         Log.d("MOVIEGRIDFRAGMENT", "ONACTIVITYCREATED");
+
     }
 
 
@@ -120,34 +115,16 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONSAVEINSTANCESTATE");
-        outState.putString(SAVED_FRAGMENT_CATEGORY, mCategory);
-    }
-
-
-    private void initAdapter() {
-        List<Movie> movieList = new ArrayList<>();
-        mAdapter = new MovieGridAdapter(movieList);
-    }
-
-
     private void loadMovies(){
 
         final Observer<List<Movie>> movieListObserver = new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
                 mAdapter.setMoviesList(movies);
-                mRecyclerView.setAdapter(mAdapter);
             }
         };
-
-        mMovieViewModel.getAllMovies().observe(this, movieListObserver);
+        mMovieViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
     }
-
 
 
     // Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
@@ -163,6 +140,4 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         }
         return networkInfo != null && networkInfo.isConnectedOrConnecting();
     }
-
-
 }
