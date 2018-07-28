@@ -136,7 +136,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
     private void initAdapter() {
         List<Movie> movieList = new ArrayList<>();
-        mAdapter = new MovieGridAdapter(movieList, getActivity());
+        mAdapter = new MovieGridAdapter(movieList);
     }
 
 

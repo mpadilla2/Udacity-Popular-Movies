@@ -22,7 +22,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
     private final static String MOVIE_ITEM = "Movie Item";
     private final List<Movie> mMoviesList;
-    private final Context mContext;
+    //private final Context mContext;
 
     class MovieViewHolder extends RecyclerView.ViewHolder{
         private final ImageView posterImage;
@@ -33,9 +33,9 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
         }
     }
 
-    public MovieGridAdapter(List<Movie> moviesList, Context mContext){
+    //    public MovieGridAdapter(List<Movie> moviesList, Context mContext){
+    public MovieGridAdapter(List<Movie> moviesList){
         this.mMoviesList = moviesList;
-        this.mContext = mContext;
     }
 
 
@@ -57,7 +57,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
         final Movie movieItem = mMoviesList.get(holder.getAdapterPosition());
 
-        Glide.with(mContext)
+        Glide.with(holder.itemView.getContext())
                 .load(movieItem.getPosterUrl())
                 .apply(new RequestOptions()
                         .placeholder(R.drawable.ic_image_loading)
@@ -67,9 +67,9 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
         holder.posterImage.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, DetailActivity.class);
+                final Intent intent = new Intent(v.getContext(), DetailActivity.class);
                 intent.putExtra(MOVIE_ITEM, movieItem);
-                mContext.startActivity(intent);
+                v.getContext().startActivity(intent);
             }
         });
     }
