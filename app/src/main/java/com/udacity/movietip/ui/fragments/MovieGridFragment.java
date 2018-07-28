@@ -41,17 +41,18 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private MovieViewModel mMovieViewModel;
     RecyclerView mRecyclerView;
 
+    public MovieGridFragment() {
+        // Required empty public constructor
+    }
+
     /* Create a new instance of MovieGridFragment, providing "category" as an argument.
      * Reference: https://developer.android.com/reference/android/app/Fragment
      */
     public MovieGridFragment newInstance(String category){
         MovieGridFragment movieGridFragment = new MovieGridFragment();
-
-        // Supply category input as an argument.
         Bundle args = new Bundle();
         args.putString(PASSED_IN_CATEGORY, category);
         movieGridFragment.setArguments(args);
-
         return movieGridFragment;
     }
 

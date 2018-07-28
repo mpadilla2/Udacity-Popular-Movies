@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity{
         // For testing glide when network is down
         Glide.get(this).clearMemory();
 
-        fragmentManager = getSupportFragmentManager();
-
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
         */
@@ -89,27 +87,10 @@ public class MainActivity extends AppCompatActivity{
             return true;
         });
 
-        if (savedInstanceState == null) {
+        fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getFragments().isEmpty()){
             navigationBottom.setSelectedItemId(R.id.navigation_popular);
-        } else {
-            if (savedInstanceState.containsKey(MOVIES_POPULAR)){
-                Log.d("MainActivity", "POPULAR FRAGMENT SAVED INSTANCE");
-                fragmentManager.getFragment(savedInstanceState, MOVIES_POPULAR);
-            }
-            if (savedInstanceState.containsKey(MOVIES_TOP_RATED)){
-                Log.d("MainActivity", "TOP RATED FRAGMENT SAVED INSTANCE");
-                fragmentManager.getFragment(savedInstanceState, MOVIES_TOP_RATED);
-            }
-            if (savedInstanceState.containsKey(MOVIES_NOW_PLAYING)){
-                Log.d("MainActivity", "NOW PLAYING FRAGMENT SAVED INSTANCE");
-                fragmentManager.getFragment(savedInstanceState, MOVIES_NOW_PLAYING);
-            }
-            if (savedInstanceState.containsKey(MOVIES_FAVORITES)){
-                Log.d("MainActivity", "FAVORITES FRAGMENT SAVED INSTANCE");
-                fragmentManager.getFragment(savedInstanceState, MOVIES_FAVORITES);
-            }
         }
-
 
         /* Reference: https://stackoverflow.com/a/44849095
          * Show/hide BottomNavigationView - this "seems" a more elegant solution than overriding coordinatorlayout behavior. Maybe that's premature or naive at this point?
@@ -157,23 +138,5 @@ public class MainActivity extends AppCompatActivity{
         }
 
         fragmentTransaction.commitNow();
-    }
-
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // locate created fragments first
-        Fragment popular = fragmentManager.findFragmentByTag(MOVIES_POPULAR);
-        Fragment topRated = fragmentManager.findFragmentByTag(MOVIES_TOP_RATED);
-        Fragment nowPlaying = fragmentManager.findFragmentByTag(MOVIES_NOW_PLAYING);
-        Fragment favorites = fragmentManager.findFragmentByTag(MOVIES_FAVORITES);
-
-        // if the fragments are created, then save to outState bundle
-        if (popular != null) fragmentManager.putFragment(outState, MOVIES_POPULAR, popular);
-        if (topRated != null) fragmentManager.putFragment(outState, MOVIES_TOP_RATED, topRated);
-        if (nowPlaying != null)fragmentManager.putFragment(outState, MOVIES_NOW_PLAYING, nowPlaying);
-        if (favorites != null) fragmentManager.putFragment(outState, MOVIES_FAVORITES, favorites);
     }
 }

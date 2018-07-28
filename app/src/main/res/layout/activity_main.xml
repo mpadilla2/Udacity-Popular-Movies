@@ -33,7 +33,10 @@
             android:name="FragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <include layout="@layout/fragment_movie_grid"/>
+        </FrameLayout>
 
 
         <!-- Bottom navigation for popular, top rated, and now playing (coming soon...favorites) -->
