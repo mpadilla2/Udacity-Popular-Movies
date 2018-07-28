@@ -1,6 +1,8 @@
 package com.udacity.movietip.data.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -17,18 +19,12 @@ import java.util.List;
 
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
 
-    final private ItemClickListener mOnClickListener;
-
+    private static final String REVIEW_INTENT_TITLE = "Choose Browser";
     private final List<Reviews> mReviewList;
-    private final Context mContext;
 
-    // Reference: Udacity Android Developer Nanodegree Program > Developing Android Apps > Lesson 4: RecyclerView > Part 20. Responding to Clicks
-    public interface ItemClickListener {
-        void onItemClick(int clickedItemIndex);
-    }
 
-    // Provide a reference to the views for each trailer item
-    class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ReviewViewHolder extends RecyclerView.ViewHolder{
+
         private final TextView reviewAuthorTextView;
         private final TextView reviewContentsTextView;
 
@@ -37,23 +33,13 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
 
             reviewAuthorTextView = view.findViewById(R.id.movie_review_author);
             reviewContentsTextView = view.findViewById(R.id.movie_review_contents_textview);
-            reviewContentsTextView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            mOnClickListener.onItemClick(getAdapterPosition());
         }
     }
 
-    // Provide a constructor
-    public ReviewsAdapter(Context context, List<Reviews> reviewsList, ItemClickListener listener){
-        this.mContext = context;
-        this.mOnClickListener = listener;
+    public ReviewsAdapter(List<Reviews> reviewsList){
         this.mReviewList = reviewsList;
     }
 
-    // Create new views as invoke by the layout manager
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -61,7 +47,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
 
         // dynamically calculate and set the width of the view
         // Reference: https://stackoverflow.com/a/50498245
-        final DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+        final DisplayMetrics displayMetrics = parent.getContext().getResources().getDisplayMetrics();
         Integer width = displayMetrics.widthPixels;
         int calculatedWidth = (int) Math.round(width/1.5);
 
@@ -70,7 +56,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
         return new ReviewViewHolder(view);
     }
 
-    // Replace the contents of a view as invoked by the layout manager
+
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
 
@@ -79,21 +65,33 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewViewHolder> {
         holder.reviewAuthorTextView.setText(currentReview.getAuthor());
         holder.reviewContentsTextView.setText(currentReview.getContent());
 
+        holder.reviewContentsTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                final Intent reviewIntent = new Intent(Intent.ACTION_VIEW);
+                reviewIntent.setData(Uri.parse(currentReview.getUrl()));
+
+                Intent chooser = Intent.createChooser(reviewIntent, REVIEW_INTENT_TITLE);
+
+                if (reviewIntent.resolveActivity(v.getContext().getPackageManager()) != null){
+                    v.getContext().startActivity(chooser);
+                }
+            }
+        });
     }
 
-    // Return the size of the list as invoked by the layout manager
+
     @Override
     public int getItemCount() {
         return mReviewList != null ? mReviewList.size() : 0;
     }
 
+
     // Reference: https://stackoverflow.com/a/48959184
     public void setReviewsList(List<Reviews> reviewsList){
-        // clear the old list
         mReviewList.clear();
-        // collecttion.addall in place of foreeach or for loop
         mReviewList.addAll(reviewsList);
-        // notify the adapter
         notifyDataSetChanged();
     }
 }

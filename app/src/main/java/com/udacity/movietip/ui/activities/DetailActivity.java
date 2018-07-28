@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -187,58 +186,10 @@ public class DetailActivity
         mReviewsRecyclerView.setHasFixedSize(true);
 
         final List<Trailers> trailersList = new ArrayList<>();
-        // Reference: https://www.codeproject.com/Tips/1229751/Handle-Click-Events-of-Multiple-Buttons-Inside-a
-        mTrailersAdapter = new TrailersAdapter(this, trailersList, new TrailersAdapter.ItemClickListener() {
-            @Override
-            public void trailerOnClick(int clickedItemIndex) {
-                // grab the clicked trailer
-                Trailers trailer = trailersList.get(clickedItemIndex);
-
-                // Reference: https://developer.android.com/guide/components/intents-common#Music
-                Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
-                trailerIntent.setData(Uri.parse(trailer.getTrailerUrl()));
-
-                // Reference: https://developer.android.com/training/basics/intents/sending#AppChooser
-                Intent chooser = Intent.createChooser(trailerIntent, "Choose Player");
-
-                if (trailerIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(chooser);
-                }
-            }
-
-            @Override
-            public void shareOnClick(int clickedItemIndex) {
-                // create share intent
-                Trailers trailer = trailersList.get(clickedItemIndex);
-
-                // Reference: https://developer.android.com/training/sharing/
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, trailer.getTrailerUrl());
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                Intent chooser = Intent.createChooser(intent, "Share video to...");
-
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(chooser);
-                }
-            }
-        });
+        mTrailersAdapter = new TrailersAdapter(trailersList);
 
         final List<Reviews> reviewsList = new ArrayList<>();
-        mReviewsAdapter = new ReviewsAdapter(this, reviewsList, clickedItemIndex -> {
-            // grab the clicked review
-            Reviews review = reviewsList.get(clickedItemIndex);
-
-            Intent reviewIntent = new Intent(Intent.ACTION_VIEW);
-            reviewIntent.setData(Uri.parse(review.getUrl()));
-
-            Intent chooser = Intent.createChooser(reviewIntent, "Choose Browser");
-
-            if (reviewIntent.resolveActivity(getPackageManager()) != null){
-                startActivity(chooser);
-            }
-        });
+        mReviewsAdapter = new ReviewsAdapter(reviewsList);
     }
 
 

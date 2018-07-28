@@ -1,6 +1,5 @@
 package com.udacity.movietip.data.adapters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +21,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
     private final static String MOVIE_ITEM = "Movie Item";
     private final List<Movie> mMoviesList;
-    //private final Context mContext;
+
 
     class MovieViewHolder extends RecyclerView.ViewHolder{
         private final ImageView posterImage;
@@ -33,7 +32,7 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
         }
     }
 
-    //    public MovieGridAdapter(List<Movie> moviesList, Context mContext){
+
     public MovieGridAdapter(List<Movie> moviesList){
         this.mMoviesList = moviesList;
     }

@@ -36,7 +36,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
     private static final String PASSED_IN_CATEGORY = "category";
 
-    private Context mContext;
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
@@ -47,8 +46,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
      */
     public MovieGridFragment newInstance(String category){
         MovieGridFragment movieGridFragment = new MovieGridFragment();
-
-        mContext = getContext();
 
         // Supply category input as an argument.
         Bundle args = new Bundle();
@@ -73,16 +70,14 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         Log.d("MOVIEGRIDFRAGMENT", "ONCREATEVIEW");
 
-        // Inflates the RecyclerView grid layout of all movie images
         final View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
 
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(mContext, RECYCLERVIEW_NUM_COLUMNS);
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getContext(), RECYCLERVIEW_NUM_COLUMNS);
 
-        // savedInstanceState check for previous category instance
         if (savedInstanceState != null){
             if (savedInstanceState.containsKey(SAVED_FRAGMENT_CATEGORY)){
                 mCategory = savedInstanceState.getString(SAVED_FRAGMENT_CATEGORY);
@@ -96,7 +91,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         setUpViewModel();
 
-        // If the network is available, make the tmdb api call with the appropriate category for the fragment
         if (isActiveNetwork()){
             loadMovies();
         } else {
@@ -154,9 +148,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
 
-    /*
-       Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
-     */
+
+    // Reference: https://developer.android.com/training/monitoring-device-state/connectivity-monitoring
     private boolean isActiveNetwork(){
 
         ConnectivityManager connectivityManager;
