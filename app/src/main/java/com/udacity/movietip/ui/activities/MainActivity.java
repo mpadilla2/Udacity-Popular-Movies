@@ -1,6 +1,5 @@
 package com.udacity.movietip.ui.activities;
 
-import android.content.Intent;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -13,13 +12,11 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.udacity.movietip.R;
-import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.ui.fragments.MovieGridFragment;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieGridFragment.OnImageClickListener{
-
+public class MainActivity extends AppCompatActivity{
     /*
     REFERENCES:
     https://developer.android.com/reference/com/google/android/material/bottomnavigation/BottomNavigationView
@@ -37,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
       Reference: https://www.simplifiedcoding.net/bottom-navigation-android-example
       Reference: https://materialdoc.com/components/bottom-navigation/
      */
-    private static final String MOVIE_ITEM = "Movie Item";
     private static final String MOVIES_POPULAR = "popular";
     private static final String MOVIES_TOP_RATED = "top_rated";
     private static final String MOVIES_NOW_PLAYING = "now_playing";
@@ -179,13 +175,5 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         if (topRated != null) fragmentManager.putFragment(outState, MOVIES_TOP_RATED, topRated);
         if (nowPlaying != null)fragmentManager.putFragment(outState, MOVIES_NOW_PLAYING, nowPlaying);
         if (favorites != null) fragmentManager.putFragment(outState, MOVIES_FAVORITES, favorites);
-    }
-
-
-    @Override
-    public void onImageSelected(Movie movie) {
-        final Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(MOVIE_ITEM, movie);
-        startActivity(intent);
     }
 }

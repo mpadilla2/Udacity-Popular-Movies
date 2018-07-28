@@ -6,7 +6,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -35,6 +34,7 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
     private static final String MOVIES_POPULAR = "popular";
     private static final String SAVED_FRAGMENT_CATEGORY = "Fragment Category";
+    private static final String PASSED_IN_CATEGORY = "category";
 
     private Context mContext;
     private MovieGridAdapter mAdapter;
@@ -52,28 +52,10 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
         // Supply category input as an argument.
         Bundle args = new Bundle();
-        args.putString("category", category);
+        args.putString(PASSED_IN_CATEGORY, category);
         movieGridFragment.setArguments(args);
 
         return movieGridFragment;
-    }
-
-
-    // Override onAttach to make sure that the container activity has implemented the callback
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure that the host activity has implemented the callback interface
-        // if not, throw an exception
-        try {
-            mCallback = (OnImageClickListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnImageClickListener");
-        }
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONATTACH");
     }
 
 
@@ -143,16 +125,6 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     }
 
 
-    // Define a new interface OnImageClickListener that triggers a callback in the host activity
-    private OnImageClickListener mCallback;
-
-
-    // OnImageClickListener interface, calls a method in the host activity name onImageSelected
-    public interface OnImageClickListener{
-        void onImageSelected(Movie movie);
-    }
-
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -163,14 +135,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
 
     private void initAdapter() {
-    /* Instantiate custom MovieGridAdapter and custom click listener
-        Reference:https://gist.github.com/riyazMuhammad/1c7b1f9fa3065aa5a46f
-    */
         List<Movie> movieList = new ArrayList<>();
-        mAdapter = new MovieGridAdapter(getActivity(), movieList, clickedItemIndex -> {
-            Movie movie = movieList.get(clickedItemIndex);
-            mCallback.onImageSelected(movie);
-        });
+        mAdapter = new MovieGridAdapter(movieList, getActivity());
     }
 
 
