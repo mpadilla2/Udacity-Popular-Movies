@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.udacity.movietip.data.model.Movie;
 import com.udacity.movietip.data.model.MoviesIndexed;
@@ -41,9 +40,7 @@ public class DataRepository {
 
     // Query is run on a background thread because we're returning LiveData.
     private LiveData<List<Movie>> getAllFavoriteMovies(){
-        LiveData<List<Movie>> mAllMovies = favoriteMoviesDAO.getAllMovies();
-        Log.d("DATAREPOSITORY", "LOADED MOVIES FOR FAVORITES FROM DATABASE");
-        return mAllMovies;
+        return favoriteMoviesDAO.getAllMovies();
     }
 
 
@@ -92,14 +89,12 @@ public class DataRepository {
                     if (response.isSuccessful()) {
                         assert response.body() != null;
                         data.setValue(Objects.requireNonNull(response.body()).getResults());
-                        Log.d("DATAREPOSITORY", "LOADED MOVIES FOR " + category + " FROM INTERNET API");
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<MoviesIndexed> call, @NonNull Throwable t) {
                     // do something here
-                    Log.d("DATAREPOSITORY", "LOADING FROM INTERNET API FOR " + category + "FAILED");
                 }
             });
             return data;
@@ -121,13 +116,11 @@ public class DataRepository {
                 if (response.isSuccessful()){
                     assert response.body() != null;
                     data.setValue(Objects.requireNonNull(response.body()).getResults());
-                    Log.d("DATAREPOSITORY", "LOADED TRAILERS FOR " + id + " FROM INTERNET API");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<TrailersIndexed> call, @NonNull Throwable t) {
-                Log.d("DATAREPOSITORY", "LOADING TRAILERS FROM INTERNET API FOR " + id + "FAILED");
             }
         });
 
@@ -145,13 +138,11 @@ public class DataRepository {
                 if (response.isSuccessful()){
                     assert response.body() != null;
                     data.setValue(Objects.requireNonNull(response.body()).getResults());
-                    Log.d("DATAREPOSITORY", "LOADED REVIEWS FOR " + id + " FROM INTERNET API");
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ReviewsIndexed> call, @NonNull Throwable t) {
-                Log.d("DATAREPOSITORY", "LOADING REVIEWS FROM INTERNET API FOR " + id + "FAILED");
             }
         });
 

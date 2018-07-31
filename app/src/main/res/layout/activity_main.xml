@@ -5,13 +5,15 @@
     android:id="@+id/main_activity_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.activities.MainActivity">
 
         <!-- Top Toolbar -->
         <android.support.design.widget.AppBarLayout
             android:id="@+id/main_activity_app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/main_activity_toolbar"
@@ -20,8 +22,7 @@
                     android:background="@color/colorPrimary"
                     app:title="Movie Tip"
                     app:layout_scrollFlags="scroll|enterAlways"
-                    app:popupTheme="@style/AppTheme.PopupOverlay"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+                    app:popupTheme="@style/AppTheme.PopupOverlay"/>
 
         </android.support.design.widget.AppBarLayout>
 
@@ -52,8 +53,3 @@
             app:menu="@menu/navigation"/>
 
 </android.support.design.widget.CoordinatorLayout>
-<!-- tried:
-     android:descendantFocusability="blocksDescendants" in main coordinatorlayout and in framelayout that contains fragment_movie_grid. it did not work to allow scroll state to restore automatically.-->
-
-<!-- coordinatorlayout -       android:fitsSystemWindows="true"
-                   -->

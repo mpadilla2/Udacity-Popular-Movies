@@ -7,8 +7,6 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/roboto_bold</item>
-        <!--Reference: https://guides.codepath.com/android/shared-element-activity-transition -->
-        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -16,5 +14,3 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
-
-<!--         <item name="coordinatorLayoutStyle">@style/Widget.Design.CoordinatorLayout</item>-->

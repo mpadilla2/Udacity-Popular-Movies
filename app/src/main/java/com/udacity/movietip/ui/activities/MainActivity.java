@@ -8,9 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
-import com.bumptech.glide.Glide;
 import com.udacity.movietip.R;
 import com.udacity.movietip.ui.fragments.MovieGridFragment;
 
@@ -43,7 +41,6 @@ public class MainActivity extends AppCompatActivity{
     private BottomNavigationView navigationBottom;
     private Toolbar toolBar;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +49,10 @@ public class MainActivity extends AppCompatActivity{
 
         toolBar = findViewById(R.id.main_activity_toolbar);
 
-        // For testing glide when network is down
-        Glide.get(this).clearMemory();
+        // For testing glide when network is down.
+        // IMPORTANT!!! If this is enabled and there are no override options in the Glide load,
+        // then scroll state does not get restored automatically for the poster images recyclerview.
+        //Glide.get(this).clearMemory();
 
         /*
          Reference: https://developer.android.com/training/basics/fragments/fragment-ui
@@ -125,7 +124,6 @@ public class MainActivity extends AppCompatActivity{
         } else {
             taggedFragment = new MovieGridFragment().newInstance(fragmentTag);
             fragmentTransaction.add(R.id.main_activity_fragment_container, taggedFragment, fragmentTag);
-            Log.d("MainActivity", "created the " + taggedFragment + " fragment");
         }
 
         // get a list of fragments currently added to the FragmentManager

@@ -2,7 +2,6 @@
 <!-- RecyclerView that displays the TMDB movies posters -->
 <android.support.v7.widget.RecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/images_recycler_view"
     android:tag="images_recycler_view"
@@ -10,8 +9,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context=".ui.activities.MainActivity"
-    tools:showIn="@layout/activity_main" />
+    tools:showIn="@layout/activity_main"
+    tools:listitem="@layout/layout_grid_item"/>
 
-<!--     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-     app:layout_anchor="@layout/activity_main"
--->

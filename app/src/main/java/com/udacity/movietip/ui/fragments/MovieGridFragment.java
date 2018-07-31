@@ -10,12 +10,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 
 import com.udacity.movietip.R;
 import com.udacity.movietip.data.adapters.MovieGridAdapter;
@@ -28,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// done https://google-developer-training.gitbooks.io/android-developer-advanced-course-concepts/unit-1-expand-the-user-experience/lesson-1-fragments/1-2-c-fragment-lifecycle-and-communications/1-2-c-fragment-lifecycle-and-communications.html
 public class MovieGridFragment extends ViewLifecycleFragment{
 
     private static final int RECYCLERVIEW_NUM_COLUMNS = 3;
@@ -38,8 +35,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
     private MovieGridAdapter mAdapter;
     private String mCategory;
     private MovieViewModel mMovieViewModel;
-    RecyclerView mRecyclerView;
-    List<Movie> movieList = new ArrayList<>();
+
+    private final List<Movie> movieList = new ArrayList<>();
 
 
     public MovieGridFragment() {
@@ -59,31 +56,21 @@ public class MovieGridFragment extends ViewLifecycleFragment{
 
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d("MOVIEGRIDFRAGMENT", "ONCREATE");
-    }
-
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        Log.d("MOVIEGRIDFRAGMENT", "ONCREATEVIEW");
 
         mCategory = getArguments() != null ? getArguments().getString(PASSED_IN_CATEGORY) : MOVIES_POPULAR;
 
         final View rootView = inflater.inflate(R.layout.fragment_movie_grid, container, false);
-        mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
+        RecyclerView mRecyclerView = rootView.findViewById(R.id.images_recycler_view);
 
         GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(), RECYCLERVIEW_NUM_COLUMNS);
+        mAdapter = new MovieGridAdapter(movieList);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.grid_layout_margin);
         mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(3, spacingInPixels, true, 0));
         mRecyclerView.setHasFixedSize(true);
-
-        mAdapter = new MovieGridAdapter(movieList);
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;
@@ -103,14 +90,11 @@ public class MovieGridFragment extends ViewLifecycleFragment{
         } else {
             Toast.makeText(getActivity(), "Oops! No network connection!", Toast.LENGTH_LONG).show();
         }
-        Log.d("MOVIEGRIDFRAGMENT", "ONACTIVITYCREATED");
-
     }
 
 
     private void setUpViewModel() {
-        MovieViewModelFactory movieViewModelFactory = new MovieViewModelFactory(Objects.requireNonNull(getActivity())
-                .getApplication(), mCategory);
+        MovieViewModelFactory movieViewModelFactory = new MovieViewModelFactory(Objects.requireNonNull(getActivity()).getApplication(), mCategory);
         mMovieViewModel = ViewModelProviders.of(this, movieViewModelFactory).get(MovieViewModel.class);
     }
 
@@ -123,6 +107,8 @@ public class MovieGridFragment extends ViewLifecycleFragment{
                 mAdapter.setMoviesList(movies);
             }
         };
+        // View lifecycle bug:
+        // Reference: https://medium.com/@BladeCoder/architecture-components-pitfalls-part-1-9300dd969808
         mMovieViewModel.getAllMovies().observe(Objects.requireNonNull(getViewLifecycleOwner()), movieListObserver);
     }
 

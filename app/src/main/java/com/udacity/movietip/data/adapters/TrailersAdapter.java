@@ -66,14 +66,14 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
     @Override
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, int position) {
 
-        holder.trailerTextView.setText(mTrailersList.get(position).getName());
+        holder.trailerTextView.setText(mTrailersList.get(holder.getAdapterPosition()).getName());
 
         /* Reference: ic_broken_image made by https://www.flaticon.com/authors/those-icons and is licensed by http://creativecommons.org/licenses/by/3.0/
            Reference: ic_image_loading icon made by https://www.flaticon.com/authors/dave-gandy and is licensed by http://creativecommons.org/licenses/by/3.0/
          */
 
         Glide.with(holder.itemView.getContext())
-                .load(mTrailersList.get(position).getTrailerThumbnailUrl())
+                .load(mTrailersList.get(holder.getAdapterPosition()).getTrailerThumbnailUrl())
                 .apply(new RequestOptions()
                     .placeholder(R.drawable.ic_image_loading)
                     .error(R.drawable.ic_broken_image)
@@ -83,11 +83,11 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         holder.trailerImageView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Trailers trailer = mTrailersList.get(position);
+                Trailers trailer = mTrailersList.get(holder.getAdapterPosition());
 
                 // Reference: https://developer.android.com/guide/components/intents-common#Music
                 Intent trailerIntent = new Intent(Intent.ACTION_VIEW);
-                trailerIntent.setData(Uri.parse(mTrailersList.get(position).getTrailerUrl()));
+                trailerIntent.setData(Uri.parse(mTrailersList.get(holder.getAdapterPosition()).getTrailerUrl()));
 
                 // Reference: https://developer.android.com/training/basics/intents/sending#AppChooser
                 Intent chooser = Intent.createChooser(trailerIntent, TRAILER_INTENT_TITLE);
@@ -101,7 +101,7 @@ public class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.Traile
         holder.shareImageButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Trailers trailer = mTrailersList.get(position);
+                Trailers trailer = mTrailersList.get(holder.getAdapterPosition());
 
                 // Reference: https://developer.android.com/training/sharing/
                 Intent intent = new Intent(Intent.ACTION_SEND);

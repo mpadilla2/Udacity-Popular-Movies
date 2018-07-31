@@ -22,6 +22,18 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
     private final static String MOVIE_ITEM = "Movie Item";
     private final List<Movie> mMoviesList;
 
+    // Reference: https://medium.com/@hanru.yeh/recyclerviews-views-are-blinking-when-notifydatasetchanged-c7b76d5149a2
+    public MovieGridAdapter(List<Movie> moviesList){
+        this.mMoviesList = moviesList;
+        setHasStableIds(true);
+    }
+
+
+    // Reference: https://medium.com/@hanru.yeh/recyclerviews-views-are-blinking-when-notifydatasetchanged-c7b76d5149a2
+    @Override
+    public long getItemId(int position) {
+        return mMoviesList.get(position).getId();
+    }
 
     class MovieViewHolder extends RecyclerView.ViewHolder{
         private final ImageView posterImage;
@@ -30,11 +42,6 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
             super(view);
             posterImage = view.findViewById(R.id.movie_poster_imageView);
         }
-    }
-
-
-    public MovieGridAdapter(List<Movie> moviesList){
-        this.mMoviesList = moviesList;
     }
 
 
@@ -56,9 +63,12 @@ public class MovieGridAdapter extends RecyclerView.Adapter<MovieGridAdapter.Movi
 
         final Movie movieItem = mMoviesList.get(holder.getAdapterPosition());
 
+        // If override dimensions are left out and glide clear memory is enabled in MainActivity,
+        // then scroll state doesn't restore for recyclerview
         Glide.with(holder.itemView.getContext())
                 .load(movieItem.getPosterUrl())
                 .apply(new RequestOptions()
+                        .override(320,360)
                         .placeholder(R.drawable.ic_image_loading)
                         .error(R.drawable.ic_broken_image))
                 .into(holder.posterImage);
